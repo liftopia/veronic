@@ -5,7 +5,7 @@ require 'optparse'
 require 'yaml'
 require "cgi"
 
-require_relative '../lib/deployer'
+require_relative '../lib/veronic'
 
 file = __FILE__
 path = File.dirname($0)
@@ -133,28 +133,28 @@ config[:dns_array]                            = ["#{config[:name]}.#{options[:dn
 
 case ARGV[0] || ENV['action']
 when "create"
-	Deployer.new(config).create
+	Veronic::Deployer.new(config).create
 when "bootstrap"
-  Deployer.new(config).bootstrap
+  Veronic::Deployer.new(config).bootstrap
 when "destroy"
-	Deployer.new(config).destroy
+	Veronic::Deployer.new(config).destroy
 when "deploy"
-  Deployer.new(config).deploy
+  Veronic::Deployer.new(config).deploy
 when "deploy_stacks"
-  Deployer.new(config).deploy_stacks
+  Veronic::Deployer.new(config).deploy_stacks
 when "deploy_apps"
-  Deployer.new(config).deploy_apps
+  Veronic::Deployer.new(config).deploy_apps
 when "run_tests"
-  Deployer.new(config).run_tests
+  Veronic::Deployer.new(config).run_tests
 when "update_instance_dns"
-	Deployer.new(config).update_instance_dns
+	Veronic::Deployer.new(config).update_instance_dns
 when "stop"
-	Deployer.new(config).stop
+	Veronic::Deployer.new(config).stop
 when "start"
-	Deployer.new(config).start
-	Deployer.new(config).update_instance_dns
+	Veronic::Deployer.new(config).start
+	Veronic::Deployer.new(config).update_instance_dns
 when "list"
-  Deployer.new(config).instances_list
+  Veronic::Deployer.new(config).instances_list
 else
 	puts opt_parser
 end
