@@ -1,10 +1,17 @@
-veronic
+Veronic
 =======
 
-<<<<<<< HEAD
-veronic, deux qui la tiennent trois qui la niquent is a simple cloud deployer
+Veronic, deux qui la tiennent trois qui la niquent is a simple cloud deployer
 
+1) Create veronic directory:
 
-=======
-veronic, deux qui la tiennent trois qui la niquent is a simple cloud deployer
->>>>>>> 200f1a8d9b355ecfdf6ec0cfb27335834728844d
+````
+$ mkdir /etc/veronic
+````
+
+2) Create veronic.yml base on https://github.com/GabKlein/veronic/blob/master/veronic.yml
+````
+$ vim /etc/veronic/veronic.yml
+
+````
+3) Set veronic.yml values
