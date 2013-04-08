@@ -1,0 +1,15 @@
+dnsprovider_access_key_id: 
+dnsprovider_secret_access_key: 
+dnsprovider_zone_url: 
+cloudprovider_access_key_id: 
+cloudprovider_secret_access_key: 
+cloudprovider_images_owner_id: 
+region: 
+availability_zone: 
+aws_ssh_key_id: 
+node_name:
+chef_server_url: 
+validation_client_name: 
+validation_key:
+client_key: 
+identity_file: 

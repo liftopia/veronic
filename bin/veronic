@@ -1,0 +1,159 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'optparse'
+require 'yaml'
+require "cgi"
+
+require_relative '../lib/deployer'
+
+file = __FILE__
+path = File.dirname($0)
+config_file = File.exists?('/etc/veronic/veronic.yml') ? '/etc/veronic/veronic.yml' : path + '/veronic.yml'
+
+options = {}
+
+opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: #{file} COMMAND [OPTIONS]"
+  opt.separator  ""
+  opt.separator  "Commands"
+  opt.separator  "     create: create box"
+  opt.separator  "     bootstrap: bootstrap box"
+  opt.separator  "     destroy: destroy box"
+  opt.separator  "     deploy: deploy box"
+  opt.separator  "     deploy_stacks: deploy stacks on box"
+  opt.separator  "     deploy_apps: destroy apps on box"
+  opt.separator  "     run_tests: tests apps on box"
+  opt.separator  "     update_instance_dns: update box dns"
+  opt.separator  "     stop: stop box"
+  opt.separator  "     start: start box"
+  opt.separator  "     list: list boxes"
+  opt.separator  ""
+  opt.separator  "Options"
+
+  options[:config_file] = ENV['config_file'] || config_file
+  opt.on("-c","--config_file veronic.yml","Use specific config file") do |c|
+    options[:config_file] = c
+  end
+  CONFIG = YAML.load_file(options[:config_file])
+
+  options[:environment] = ENV['environment'] || 'branch'
+  opt.on("-E","--environment ENVIRONMENT","Which environment you want box run") do |e|
+    options[:environment] = e
+  end
+
+  options[:name] = ENV['name'] || 'sitemap-generator-45625091'
+    opt.on("-N","--node-name NAME","Which node name you want for the box") do |n|
+    options[:name] = n
+  end
+
+  options[:branch] = ENV['branch']
+  opt.on("-b","--branch BRANCH","Which branch you want to run a box for") do |b|
+    options[:branch] = b
+  end
+  
+  options[:ssh_user] = ENV['ssh_user'] || "ubuntu"
+  opt.on("-u","--ssh_user ssh_user","Which ssh user use to connect box") do |s|
+    options[:ssh_user] = s
+  end
+  
+  options[:ssh_port] = ENV['ssh_port'] || 22
+  opt.on("-p","--ssh_port ssh_port","Which ssh port use to connect box") do |p|
+    options[:ssh_port] = p
+  end
+
+  options[:identity_file] = ENV['identity_file'] || CONFIG['identity_file']
+  opt.on("-i","--identity_file identity_file.pem","Which file use by ssh to connect box") do |i|
+    options[:identity_file] = i
+  end
+
+  options[:role] = ENV['role'] || 'beta'
+  opt.on("-r","--role role","Which role use to deploy the box") do |r|
+    options[:role] = r
+  end
+
+  options[:flavor] = ENV['flavor'] || 'm1.medium'
+  opt.on("-f","--flavor flavor","Which flavor use to deploy the box") do |f|
+    options[:flavor] = f
+  end
+
+  options[:dns_zone_name] = ENV['dns_zone_name'] || 'aipotfil.com'
+  opt.on("-d","--dns_zone_name dns_zone_name","Which dns zone use for the box's dns") do |d|
+    options[:dns_zone_name] = d
+  end
+
+  options[:security_groups] = ENV['security_groups'] || 'public-web'
+  opt.on("-S","--security_groups security_groups","Which security groups use for the box") do |s|
+    options[:security_groups] = s
+  end
+
+  options[:deploy_cmd] = ENV['deploy_cmd'] || 'sudo chef-client'
+  opt.on("-D","--deploy_cmd security_groups","Which command line us to deploy the box") do |dc|
+    options[:deploy_cmd] = dc
+  end
+
+  opt.on("-h","--help","help")
+end
+
+opt_parser.parse!
+
+config = {}
+config[:dnsprovider]                          = :route53
+config[:cloudprovider]                        = :ec2
+config[:configprovider]                       = :chefserver
+config[:dnsprovider_access_key_id]            = CONFIG['dnsprovider_access_key_id']
+config[:dnsprovider_secret_access_key]        = CONFIG['dnsprovider_secret_access_key']
+config[:cloudprovider_access_key_id]          = CONFIG['cloudprovider_access_key_id']
+config[:cloudprovider_secret_access_key]      = CONFIG['cloudprovider_secret_access_key']
+config[:cloudprovider_images_owner_id]        = CONFIG['cloudprovider_images_owner_id']
+config[:dnsprovider_zone_url]                 = CONFIG['dnsprovider_zone_url']
+config[:region]                               = CONFIG['us-east-1']
+config[:availability_zone]                    = CONFIG['us-east-1b']
+config[:aws_ssh_key_id]                       = CONFIG['aws_ssh_key_id']
+config[:node_name]                            = CONFIG['node_name']
+config[:client_key]                           = CONFIG['client_key']
+config[:validation_client_name]               = CONFIG['validation_client_name']
+config[:validation_key]                       = CONFIG['validation_key']
+config[:chef_server_url]                      = CONFIG['chef_server_url']
+config[:identity_file]                        = options[:identity_file]
+config[:dnsprovider_zone_name]                = "#{options[:dns_zone_name]}."
+config[:branch]                               = options[:branch]
+config[:environment]                          = options[:environment]
+config[:name]                                 = options[:branch] ? options[:branch] : options[:name]
+config[:ssh_user]                             = options[:ssh_user]
+config[:ssh_port]                             = options[:ssh_port]
+config[:role]                                 = options[:role]
+config[:roles]                                = "role[#{options[:role]}]"
+config[:flavor]                               = options[:flavor]
+config[:domain]                               = options[:dns_zone_name]
+config[:security_groups]                      = [options[:security_groups]]
+config[:deploy_cmd]                           = options[:deploy_cmd]
+config[:dns_array]                            = ["#{config[:name]}.#{options[:dns_zone_name]}", "#{config[:name]}.core.#{options[:dns_zone_name]}", "#{config[:name]}.store.#{options[:dns_zone_name]}", "*.#{config[:name]}.store.#{options[:dns_zone_name]}"]
+
+case ARGV[0] || ENV['action']
+when "create"
+	Deployer.new(config).create
+when "bootstrap"
+  Deployer.new(config).bootstrap
+when "destroy"
+	Deployer.new(config).destroy
+when "deploy"
+  Deployer.new(config).deploy
+when "deploy_stacks"
+  Deployer.new(config).deploy_stacks
+when "deploy_apps"
+  Deployer.new(config).deploy_apps
+when "run_tests"
+  Deployer.new(config).run_tests
+when "update_instance_dns"
+	Deployer.new(config).update_instance_dns
+when "stop"
+	Deployer.new(config).stop
+when "start"
+	Deployer.new(config).start
+	Deployer.new(config).update_instance_dns
+when "list"
+  Deployer.new(config).instances_list
+else
+	puts opt_parser
+end
