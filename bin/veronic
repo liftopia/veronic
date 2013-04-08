@@ -115,6 +115,7 @@ config[:client_key]                           = CONFIG['client_key']
 config[:validation_client_name]               = CONFIG['validation_client_name']
 config[:validation_key]                       = CONFIG['validation_key']
 config[:chef_server_url]                      = CONFIG['chef_server_url']
+config[:ssl_version]                          = CONFIG['ssl_version']
 config[:identity_file]                        = options[:identity_file]
 config[:dnsprovider_zone_name]                = "#{options[:dns_zone_name]}."
 config[:branch]                               = options[:branch]

@@ -6,6 +6,7 @@ require 'chef/knife/ssh'
 require 'chef/knife/node_run_list_add'
 require 'chef/knife/core/bootstrap_context'
 require 'chef/knife/ec2_base'
+require_relative 'rest_request'
 
 module Provider
 	class ChefServer

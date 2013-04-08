@@ -13,3 +13,4 @@ validation_client_name:
 validation_key:
 client_key: 
 identity_file: 
+ssl_version: 
