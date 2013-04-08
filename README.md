@@ -13,7 +13,14 @@ $ mkdir /etc/veronic
 
 ````
 $ vim /etc/veronic/veronic.yml
-
 ````
 
 3) Set veronic.yml values
+
+Usage
+=======
+
+````
+$ gem install veronic
+$ veronic --help
+````
