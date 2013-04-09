@@ -114,7 +114,6 @@ when "stop"
 	Veronic::Deployer.new(options).stop
 when "start"
 	Veronic::Deployer.new(options).start
-	Veronic::Deployer.new(options).update_instance_dns
 when "list"
   Veronic::Deployer.new(options).instances_list
 else

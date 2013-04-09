@@ -11,7 +11,6 @@ module Provider
 			@zone_name = config[:dnsprovider_zone_name]
 			@zone_url = config[:dnsprovider_zone_url]
 			@r53 = r53
-			#@zone = zone(zone_name, zone_url)
 		end
 		
 		def r53

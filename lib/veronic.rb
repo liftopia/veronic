@@ -91,10 +91,9 @@ module Veronic
 		end
 
 		def update_instance_dns
-			puts config_hash[:dnsprovider_zone_params].count
-			config_hash[:dnsprovider_zone_params].each do |params|
-				zone_name 	= params['zone_name']
-				zone_url 	= params['zone_url']
+			config_hash[:dnsprovider_zones].each do |z|
+				zone_name 	= z['zone_name']
+				zone_url 	= z['zone_url']
 				dns 		= "*.#{config_hash[:name]}.#{zone_name}"
 				puts "Setting DNS #{dns} ..."
 				zone 		= dnsprovider.zone(zone_name, zone_url)

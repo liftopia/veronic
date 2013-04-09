@@ -1,6 +1,6 @@
 dnsprovider_access_key_id:
 dnsprovider_secret_access_key:
-dnsprovider_zone_params:
+dnsprovider_zones:
 cloudprovider_access_key_id:
 cloudprovider_secret_access_key:
 cloudprovider_images_owner_id:
