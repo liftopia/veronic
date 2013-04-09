@@ -1,10 +1,9 @@
 dnsprovider_access_key_id:
 dnsprovider_secret_access_key:
+dnsprovider_zone_params:
 cloudprovider_access_key_id:
 cloudprovider_secret_access_key:
 cloudprovider_images_owner_id:
-dnsprovider_zone_url:
-dnsprovider_zone_name:
 region:
 availability_zone:
 aws_ssh_key_id:

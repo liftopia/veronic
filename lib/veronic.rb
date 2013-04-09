@@ -7,11 +7,7 @@ module Veronic
 	class Deployer
 
 		def initialize(options={})
-			@config 		= config(options)
-			@config_hash	= @config.to_hash
-			@role 			= @config_hash[:role]
-			@environment	= @config_hash[:environment]	
-			@deploy_cmd		= @config_hash[:deploy_cmd]
+			@config = config(options)
 		end
 		
 		def config
@@ -22,16 +18,20 @@ module Veronic
 			@config || Veronic::Config.new(options)
 		end
 
+		def config_hash
+			@config.to_hash
+		end		
+
 		def configprovider
-			ConfigProvider.new(@config_hash) 
+			ConfigProvider.new(config_hash) 
 		end
 
 		def dnsprovider
-			DnsProvider.new(@config_hash)
+			DnsProvider.new(config_hash)
 		end
 
 		def cloudprovider
-			CloudProvider.new(@config_hash)
+			CloudProvider.new(config_hash)
 		end
 
 		def create
@@ -91,9 +91,14 @@ module Veronic
 		end
 
 		def update_instance_dns
-			@dns_array.each do |dns|
+			puts config_hash[:dnsprovider_zone_params].count
+			config_hash[:dnsprovider_zone_params].each do |params|
+				zone_name 	= params['zone_name']
+				zone_url 	= params['zone_url']
+				dns 		= "*.#{config_hash[:name]}.#{zone_name}"
 				puts "Setting DNS #{dns} ..."
-			    dnsprovider.zone.record.new(dnsprovider.zone, dns, [cloudprovider.instance.public_ip_address], "A", "10")
+				zone 		= dnsprovider.zone(zone_name, zone_url)
+			    record 		= zone.record.new(zone, dns, [cloudprovider.instance.public_ip_address], "A", "10")
 			    puts "DNS #{dns} updated"
 			end
 		end

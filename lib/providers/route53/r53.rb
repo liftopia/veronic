@@ -8,18 +8,22 @@ module Provider
 		def initialize(config)
 			@access_key_id = config[:dnsprovider_access_key_id]
 			@secret_access_key = config[:dnsprovider_secret_access_key]
-			@zone_name = config[:dnsprovider_zone_name] || '' + '.'
+			@zone_name = config[:dnsprovider_zone_name]
 			@zone_url = config[:dnsprovider_zone_url]
 			@r53 = r53
-			@zone = zone
+			#@zone = zone(zone_name, zone_url)
 		end
 		
 		def r53
 			Route53::Connection.new(@access_key_id, @secret_access_key)
 		end
 
-		def zone
-			Provider::R53::Zone.new(@r53, @zone_name, @zone_url) rescue puts 'Bad DNS settings'
+		def zone(zone_name, zone_url)
+			begin
+				Provider::R53::Zone.new(@r53, zone_name, zone_url)
+			rescue
+				puts 'Bad DNS settings'
+			end
 		end
 		
 	end

@@ -6,7 +6,7 @@ module Provider
 				@zone_name = zone_name
 				@zone_url = zone_url
 				@r53 = r53
-				@zone =  zone
+				@zone = zone
 			end
 
 			def record
@@ -18,7 +18,7 @@ module Provider
 			end
 
 			def zone
-				zone = Route53::Zone.new(@zone_name, @zone_url, @r53)
+				Route53::Zone.new(@zone_name, @zone_url, @r53)
 			end
 
 		end

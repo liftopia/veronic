@@ -11,11 +11,10 @@ module Veronic
 			@configprovider                 	= :chefserver
 			@dnsprovider_access_key_id      	= options[:dnsprovider_access_key_id] 									|| config_from_file['dnsprovider_access_key_id']
 			@dnsprovider_secret_access_key  	= options[:dnsprovider_secret_access_key] 								|| config_from_file['dnsprovider_secret_access_key']
+			@dnsprovider_zone_params           	= options[:dnsprovider_zone_params] 									|| config_from_file['dnsprovider_zone_params']
 			@cloudprovider_access_key_id	   	= options[:cloudprovider_access_key_id] 								|| config_from_file['cloudprovider_access_key_id']
 			@cloudprovider_secret_access_key	= options[:cloudprovider_secret_access_key] 							|| config_from_file['cloudprovider_secret_access_key']
 			@cloudprovider_images_owner_id  	= options[:cloudprovider_images_owner_id] 								|| config_from_file['cloudprovider_images_owner_id']
-			@dnsprovider_zone_url           	= options[:dnsprovider_zone_url] 										|| config_from_file['dnsprovider_zone_url']
-			@dnsprovider_zone_name          	= options[:dnsprovider_zone_name] 										|| config_from_file['dnsprovider_zone_name']
 			@region                         	= options[:region] 														|| config_from_file['region']
 			@availability_zone              	= options[:availability_zone] 											|| config_from_file['availability_zone']
 			@aws_ssh_key_id                 	= options[:aws_ssh_key_id] 												|| config_from_file['aws_ssh_key_id']

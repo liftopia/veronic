@@ -8,7 +8,6 @@ module Provider
 				@values = values
 				@type =  type
 				@ttl = ttl
-				@update = wait_set
 			end
 			
 			def get
