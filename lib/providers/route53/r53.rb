@@ -8,7 +8,7 @@ module Provider
 		def initialize(config)
 			@access_key_id = config[:dnsprovider_access_key_id]
 			@secret_access_key = config[:dnsprovider_secret_access_key]
-			@zone_name = config[:dnsprovider_zone_name]
+			@zone_name = config[:dnsprovider_zone_name] || '' + '.'
 			@zone_url = config[:dnsprovider_zone_url]
 			@r53 = r53
 			@zone = zone
@@ -19,7 +19,7 @@ module Provider
 		end
 
 		def zone
-			Provider::R53::Zone.new(@r53, @zone_name, @zone_url)
+			Provider::R53::Zone.new(@r53, @zone_name, @zone_url) rescue puts 'Bad DNS settings'
 		end
 		
 	end

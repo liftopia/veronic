@@ -23,7 +23,7 @@ module Provider
 				@identity_file									= config[:identity_file]
 				@aws_ssh_key_id									= config[:aws_ssh_key_id]
 				@environment									= config[:environment]
-				@roles											= config[:roles]
+				@roles											= "role[#{config[:role]}]"
 				@flavor											= config[:flavor]
 				@region											= config[:region]
 				@availability_zone								= config[:availability_zone]
