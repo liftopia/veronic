@@ -6,6 +6,8 @@ require 'chef/knife/ssh'
 require 'chef/knife/node_run_list_add'
 require 'chef/knife/core/bootstrap_context'
 require 'chef/knife/ec2_base'
+require 'chef/node'
+
 require_relative 'rest_request'
 
 module Provider
@@ -95,6 +97,15 @@ module Provider
 				node = Chef::Knife::NodeRunListAdd.new()
 				node.name_args = [@name, @roles]
 				node.run
+			end
+
+			def set_environnment
+				node = Chef::Node.new.tap do |n|
+					n.name( @name )
+          			n.chef_environment( @environment )
+          		end
+          		node.save
+          		puts "Environnment: #{@environment}"
 			end
 
 			def ssh(query, cmd_line, manual)

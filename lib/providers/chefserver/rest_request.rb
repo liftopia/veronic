@@ -13,7 +13,7 @@ class Chef
         end
         if url.scheme == HTTPS
           @http_client.use_ssl = true
-          if config[:ssl_version].to_sym == :SSLv3
+          if config[:ssl_version] == :SSLv3
           	@http_client.ssl_version = :SSLv3
           end
           if config[:ssl_verify_mode] == :verify_none

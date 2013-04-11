@@ -1,5 +1,5 @@
-module Provider
-	class R53::Zone
+module Route53
+	class Zone
 		class Record
 
 			def initialize(zone, name, values=[], type, ttl)
@@ -36,12 +36,17 @@ module Provider
 				if self.exist?
 					record = self.get
 					new_record = Route53::DNSRecord.new(record.name, record.type, record.ttl, record.values, @zone)
-					action = "update"
 					record.update(@name, @type, @ttl, @values, @zone)
 				else
 					record = Route53::DNSRecord.new(@name, @type, @ttl, @values, @zone)
-					action = "create"
 					record.create
+				end
+			end
+
+			def delete
+				if self.exist?
+					record = Route53::DNSRecord.new(@name, @type, @ttl, @values, @zone)
+					record.delete
 				end
 			end
 			

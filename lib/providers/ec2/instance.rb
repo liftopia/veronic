@@ -10,18 +10,24 @@ module Provider
 
 			def stop
 				print "Stopping instance #{@name}..."
-				@instance.stop if @instance.status == :running
-				while @instance.status != :stopped && @i < 40
-					print "." ; sleep 3 ; @i += 1 || 1
+				if @instance.exist && @instance.status == :running
+					@instance.stop
+					@i = 0
+					while @instance.status != :stopped && @i < 40
+						print "." ; sleep 3 ; @i += 1
+					end
 				end
 				puts "\nInstance #{@name} is stopped"
 			end
 
 			def start
 				print "Starting instance #{@name}..."
-				@instance.start if @instance.status == :stopped && @i < 40
-				while @instance.status != :running
-					print "." ; sleep 3 ; @i += 1 || 1
+				if @instance.exist && @instance.status == :stopped
+					@instance.start
+					@i = 0 					
+					while @instance.status != :running && @i < 40
+						print "." ; sleep 3 ; @i += 1
+					end
 				end
 				puts "\nInstance #{@name} is started"
 			end

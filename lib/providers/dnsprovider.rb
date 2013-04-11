@@ -13,7 +13,8 @@ class DnsProvider
 		DNSPROVIDERS[@config[:dnsprovider]].new(@config)
 	end
 
-	def zone(zone_name, zone_url)
-		@dnsprovider.zone(zone_name, zone_url)
+	def zone
+		@dnsprovider.zone
 	end
+	
 end

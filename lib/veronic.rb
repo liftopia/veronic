@@ -2,6 +2,7 @@ require_relative 'config/config'
 require_relative 'providers/cloudprovider'
 require_relative 'providers/dnsprovider'
 require_relative 'providers/configprovider'
+require 'pp'
 
 module Veronic
 	class Deployer
@@ -70,11 +71,20 @@ module Veronic
 		end
 
 		def destroy
+			config_hash[:dnsprovider_zones].each do |z|
+				@config.zone_name 	= z['zone_name']
+				@config.zone_url 	= z['zone_url']
+				dns 				= "#{config_hash[:name]}.#{z['zone_name']}"
+				puts 				"Setting DNS #{dns} ..."
+				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.public_ip_address], "A", "10").delete
+				puts 				"DNS #{dns} deleted"
+			end
 			if cloudprovider.instance.exist?
 				configprovider.instance.destroy([cloudprovider.instance.id])
 			else
 				configprovider.instance.destroy([])
 			end
+
 		end
 
 		def deploy
@@ -92,13 +102,12 @@ module Veronic
 
 		def update_instance_dns
 			config_hash[:dnsprovider_zones].each do |z|
-				zone_name 	= z['zone_name']
-				zone_url 	= z['zone_url']
-				dns 		= "*.#{config_hash[:name]}.#{zone_name}"
-				puts "Setting DNS #{dns} ..."
-				zone 		= dnsprovider.zone(zone_name, zone_url)
-			    record 		= zone.record.new(zone, dns, [cloudprovider.instance.public_ip_address], "A", "10")
-			    puts "DNS #{dns} updated"
+				@config.zone_name 	= z['zone_name']
+				@config.zone_url 	= z['zone_url']
+				dns 				= "#{config_hash[:name]}.#{z['zone_name']}"
+				puts 				"Setting DNS #{dns} ..."
+				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.public_ip_address], "A", "10").wait_set
+				puts 				"DNS #{dns} updated"
 			end
 		end
 
@@ -107,28 +116,36 @@ module Veronic
 		end
 
 		def stop
-			cloudprovider.instance.stop
+			if cloudprovider.instance.exist?
+				cloudprovider.instance.stop
+			end
 		end
 
 		def start
-			cloudprovider.instance.start
-			update_instance_dns
+			if cloudprovider.instance.exist?
+				cloudprovider.instance.start
+				update_instance_dns
+			end
 		end
 
 		def bootstrap
 			@config.image = cloudprovider.image.id
 			if cloudprovider.instance.status == :running
-				return false
+				puts "#{config_hash[:name]} is running"		
 			elsif cloudprovider.instance.status == :stopped
 				start
-				return false
 			elsif cloudprovider.instance.exist? == false
-				configprovider.instance.bootstrap
+				configprovider.instance.bootstrap 
+				configprovider.instance.set_environnment
 				configprovider.instance.set_role
+				update_instance_dns
 				return true
 			else
 				raise ArgumentError.new('Error during connecting instance')  
 			end
+			configprovider.instance.set_environnment
+			configprovider.instance.set_role
+			return false
 		end
 	end
 end

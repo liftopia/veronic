@@ -1,6 +1,6 @@
 module Veronic
 	class Config
-		attr_accessor  :dnsprovider, :cloudprovider, :configprovider, :dnsprovider_access_key_id, :dnsprovider_secret_access_key, :cloudprovider_access_key_id, :cloudprovider_secret_access_key, :cloudprovider_images_owner_id, :dnsprovider_zones, :region, :availability_zone, :aws_ssh_key_id, :node_name, :client_key, :validation_client_name, :validation_key, :chef_server_url, :ssl_version, :identity_file, :branch, :environment, :ssh_user, :ssh_port, :role, :flavor, :security_groups, :deploy_cmd, :name, :image
+		attr_accessor  :dnsprovider, :cloudprovider, :configprovider, :dnsprovider_access_key_id, :dnsprovider_secret_access_key, :cloudprovider_access_key_id, :cloudprovider_secret_access_key, :cloudprovider_images_owner_id, :dnsprovider_zones, :region, :availability_zone, :aws_ssh_key_id, :node_name, :client_key, :validation_client_name, :validation_key, :chef_server_url, :ssl_version, :identity_file, :branch, :environment, :ssh_user, :ssh_port, :role, :flavor, :security_groups, :deploy_cmd, :name, :image, :zone_name, :zone_url
 
 		def initialize(options={})
 			config_file = File.exists?('/etc/veronic/veronic.yml') ? '/etc/veronic/veronic.yml' : '../../' + File.dirname($0) + '/veronic.yml'

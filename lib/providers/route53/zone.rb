@@ -1,26 +1,13 @@
-module Provider
-	class R53
-		class Zone
+module Route53
+	class Zone
 
-			def initialize(r53, zone_name, zone_url)
-				@zone_name = zone_name
-				@zone_url = zone_url
-				@r53 = r53
-				@zone = zone
-			end
-
-			def record
-				Provider::R53::Zone::Record
-			end
-
-			def records
-				@zone.get_records
-			end
-
-			def zone
-				Route53::Zone.new(@zone_name, @zone_url, @r53)
-			end
-
+		def record(name, values=[], type, ttl)
+			Route53::Zone::Record.new(self, name, values, type, ttl)
 		end
+
+		def records
+			self.get_records
+		end
+
 	end
 end
