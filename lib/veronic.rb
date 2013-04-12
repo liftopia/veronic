@@ -76,7 +76,7 @@ module Veronic
 				@config.zone_url 	= z['zone_url']
 				dns 				= "#{config_hash[:name]}.#{z['zone_name']}"
 				puts 				"Setting DNS #{dns} ..."
-				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.public_ip_address], "A", "10").delete
+				record 				= dnsprovider.zone.record(dns, [], "A", "1").delete
 				puts 				"DNS #{dns} deleted"
 			end
 			if cloudprovider.instance.exist?
@@ -106,7 +106,7 @@ module Veronic
 				@config.zone_url 	= z['zone_url']
 				dns 				= "#{config_hash[:name]}.#{z['zone_name']}"
 				puts 				"Setting DNS #{dns} ..."
-				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.public_ip_address], "A", "10").wait_set
+				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.public_ip_address], "A", "1").wait_set
 				puts 				"DNS #{dns} updated"
 			end
 		end
@@ -116,36 +116,52 @@ module Veronic
 		end
 
 		def stop
-			if cloudprovider.instance.exist?
-				cloudprovider.instance.stop
-			end
+			cloudprovider.instance.stop
 		end
 
 		def start
-			if cloudprovider.instance.exist?
-				cloudprovider.instance.start
+			unless cloudprovider.instance.start == false
 				update_instance_dns
 			end
 		end
 
+		def status
+			if config_hash[:name]
+				return cloudprovider.instance.status
+			else
+				return "Arguments name missing"
+			end
+		end
+
 		def bootstrap
-			@config.image = cloudprovider.image.id
+			get_image
 			if cloudprovider.instance.status == :running
 				puts "#{config_hash[:name]} is running"		
 			elsif cloudprovider.instance.status == :stopped
 				start
 			elsif cloudprovider.instance.exist? == false
 				configprovider.instance.bootstrap 
-				configprovider.instance.set_environnment
-				configprovider.instance.set_role
+				set_node
 				update_instance_dns
 				return true
 			else
-				raise ArgumentError.new('Error during connecting instance')  
+				abort('Error during connecting instance')  
 			end
-			configprovider.instance.set_environnment
-			configprovider.instance.set_role
+			set_node
 			return false
+		end
+
+		def set_node
+			if config_hash[:role] && config_hash[:environment]
+				configprovider.instance.set_environment
+				configprovider.instance.set_role
+			else
+				abort('Arguments "role" or "environment" missing') 
+			end
+		end
+
+		def get_image
+			@config.image = cloudprovider.image.id
 		end
 	end
 end

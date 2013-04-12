@@ -45,8 +45,9 @@ module Route53
 
 			def delete
 				if self.exist?
-					record = Route53::DNSRecord.new(@name, @type, @ttl, @values, @zone)
-					record.delete
+					record = self.get
+					delete_record = Route53::DNSRecord.new(record.name, record.type, record.ttl, record.values, @zone)
+					delete_record.delete
 				end
 			end
 			

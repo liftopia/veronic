@@ -23,7 +23,9 @@ module Provider
 		end
 
 		def instances
-			@ec2.instances
+			AWS.memoize do
+				@instances ||= @ec2.instances
+			end
 		end
 
 		def ec2

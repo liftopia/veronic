@@ -25,6 +25,7 @@ opt_parser = OptionParser.new do |opt|
   opt.separator  "     stop: stop box"
   opt.separator  "     start: start box"
   opt.separator  "     list: list boxes"
+  opt.separator  "     status: status boxes"
   opt.separator  ""
   opt.separator  "Options"
 
@@ -116,6 +117,8 @@ when "start"
 	Veronic::Deployer.new(options).start
 when "list"
   Veronic::Deployer.new(options).instances_list
+when "status"
+  puts Veronic::Deployer.new(options).status
 else
 	puts opt_parser
 end

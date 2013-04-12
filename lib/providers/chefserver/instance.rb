@@ -99,13 +99,13 @@ module Provider
 				node.run
 			end
 
-			def set_environnment
+			def set_environment
 				node = Chef::Node.new.tap do |n|
 					n.name( @name )
           			n.chef_environment( @environment )
           		end
           		node.save
-          		puts "Environnment: #{@environment}"
+          		puts "Environment: #{@environment}"
 			end
 
 			def ssh(query, cmd_line, manual)

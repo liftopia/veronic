@@ -5,15 +5,18 @@ module Provider
 			def initialize(ec2, name)
 				@ec2 = ec2
 				@name = name
-		        @instance = @ec2.instances.select {|x| x.tags['Name'] == @name && x.status != :shutting_down && x.status != :terminated}.first
+		       	@instance = instance
 		    end
 
 			def stop
 				print "Stopping instance #{@name}..."
-				if @instance.exist && @instance.status == :running
+				if self.exist?
 					@instance.stop
 					@i = 0
-					while @instance.status != :stopped && @i < 40
+					while self.status != :stopped
+						if @i > 120 
+							return false
+						end
 						print "." ; sleep 3 ; @i += 1
 					end
 				end
@@ -22,10 +25,16 @@ module Provider
 
 			def start
 				print "Starting instance #{@name}..."
-				if @instance.exist && @instance.status == :stopped
+				if self.exist?
+					while self.status == :stopping
+						sleep 2
+					end
 					@instance.start
 					@i = 0 					
-					while @instance.status != :running && @i < 40
+					while self.status != :running
+						if @i > 120 
+							return false
+						end
 						print "." ; sleep 3 ; @i += 1
 					end
 				end
@@ -34,7 +43,7 @@ module Provider
 
 			def exist?
 				puts "Checking for ec2 server #{@name} ..."
-				if @ec2.instances.any? {|x| x.tags['Name'] == @name && x.status != :shutting_down && x.status != :terminated}
+				if AWS.memoize do @ec2.instances.any? {|x| x.tags['Name'] == @name && x.status != :shutting_down && x.status != :terminated} end
 					puts "Instance #{@name} found"
 					return true
 				else
@@ -44,11 +53,7 @@ module Provider
 			end
 
 			def status
-				begin
-					@instance.status
-				rescue Exception => e
-					return :missing
-				end
+				@instance.status
 			end
 
 			def dns_name
@@ -60,7 +65,17 @@ module Provider
 			end
 
 			def id
-				@instance.id
+				@id ||= get_instance.id
+			end
+
+			def instance
+				@ec2.instances[id]
+			end
+
+			def get_instance
+				AWS.memoize do
+					@ec2.instances.select {|x| x.tags['Name'] == @name && x.status != :shutting_down && x.status != :terminated}.first
+				end
 			end
 					
 		end

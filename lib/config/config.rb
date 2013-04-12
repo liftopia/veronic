@@ -26,10 +26,10 @@ module Veronic
 			@ssl_version                    	= options[:ssl_version] 												|| config_from_file['ssl_version']
 			@identity_file	                 	= options[:identity_file] 												|| config_from_file['identity_file']
 			@branch                         	= options[:branch] 														|| config_from_file['branch']
-			@environment                    	= options[:environment] 												|| config_from_file['environment'] || 'beta'
+			@environment                    	= options[:environment] 												|| config_from_file['environment']
 			@ssh_user                       	= options[:ssh_user] 													|| config_from_file['ssh_user']	|| 'ubuntu'
 			@ssh_port                       	= options[:ssh_port] 													|| config_from_file['ssh_port']	|| 22
-			@role                           	= options[:role] 														|| config_from_file['role'] || 'default'
+			@role                           	= options[:role] 														|| config_from_file['role']
 			@flavor                         	= options[:flavor] 														|| config_from_file['flavor'] || 'm1.medium'
 			@security_groups                	= [options[:security_groups]] 											|| [config_from_file['security_groups']]
 			@deploy_cmd                     	= options[:deploy_cmd] 													|| config_from_file['deploy_cmd'] || 'sudo chef-client'
