@@ -29,6 +29,7 @@ module Provider
 				@flavor											= config[:flavor]
 				@region											= config[:region]
 				@availability_zone								= config[:availability_zone]
+				@verbose 										= config[:verbose]
 				Chef::Config[:knife][:image] 					= @image
 				Chef::Config[:knife][:aws_ssh_key_id] 			= @aws_ssh_key_id
 				Chef::Config[:knife][:aws_access_key_id] 		= @access_key_id
@@ -41,56 +42,61 @@ module Provider
 			def create
 				puts "Creating ec2 server #{@name} ..."
 				
-				create = Chef::Knife::Ec2ServerCreate.new()
+				node = Chef::Knife::Ec2ServerCreate.new()
 
-				create.config[:run_list]        	= [@roles]
-				create.config[:image]           	= @image
-				create.config[:flavor]          	= @flavor
-				create.config[:security_groups] 	= @security_groups
-				create.config[:ssh_user]        	= @ssh_user
-				create.config[:ssh_port]        	= @ssh_port
-				create.config[:chef_node_name]  	= @name
-				create.config[:identity_file]		= @identity_file
-				create.config[:environment]			= @environment
-				create.config[:log_level] 			= :debug
+				node.config[:run_list]        	= [@roles]
+				node.config[:image]           	= @image
+				node.config[:flavor]          	= @flavor
+				node.config[:security_groups] 	= @security_groups
+				node.config[:ssh_user]        	= @ssh_user
+				node.config[:ssh_port]        	= @ssh_port
+				node.config[:chef_node_name]  	= @name
+				node.config[:identity_file]		= @identity_file
+				node.config[:environment]		= @environment
+				node.config[:log_level] 		= @verbose
 
-				puts create.config
-				create.run
+				puts node.config
+				node.run
 			end
 
-			def bootstrap
+			def bootstrap(recursive_count=0)
 				puts "Bootstrapping ec2 server #{@name} ..."
 				
-				bootstrap = Chef::Knife::Ec2ServerCreate.new()
+				node = Chef::Knife::Ec2ServerCreate.new()
 
-				bootstrap.config[:image]           	= @image
-				bootstrap.config[:flavor]          	= @flavor
-				bootstrap.config[:security_groups] 	= @security_groups
-				bootstrap.config[:ssh_user]        	= @ssh_user
-				bootstrap.config[:ssh_port]        	= @ssh_port
-				bootstrap.config[:chef_node_name]  	= @name
-				bootstrap.config[:identity_file]	= @identity_file
-				bootstrap.config[:environment]		= @environment
-				bootstrap.config[:log_level] 		= :debug
+				node.config[:image]           	= @image
+				node.config[:flavor]          	= @flavor
+				node.config[:security_groups] 	= @security_groups
+				node.config[:ssh_user]        	= @ssh_user
+				node.config[:ssh_port]        	= @ssh_port
+				node.config[:chef_node_name]  	= @name
+				node.config[:identity_file]		= @identity_file
+				node.config[:environment]		= @environment
+				node.config[:log_level] 		= @verbose
 
-				puts bootstrap.config
-				bootstrap.run
+				puts node.config
+				begin
+					node.run
+				rescue
+					self.destroy([node.server.id])
+					self.bootstrap(recursive_count+=1) if recursive_count < 3
+				end
 			end
 
 			def destroy(instance_ids = [])
 				puts "Deleting ec2 server #{@name} ..."
 
-				destroy = Chef::Knife::Ec2ServerDelete.new()
+				node = Chef::Knife::Ec2ServerDelete.new()
 
-				destroy.config[:purge]        		= true
-				destroy.config[:chef_node_name]		= @name
-				destroy.config[:yes]				= true
-				destroy.name_args 					= instance_ids
+				node.config[:purge]        		= true
+				node.config[:chef_node_name]	= @name
+				node.config[:yes]				= true
+				node.name_args 					= instance_ids
 
-				puts destroy.config
-				destroy.run
-				destroy.destroy_item(Chef::Node, @name, "node")
-				destroy.destroy_item(Chef::ApiClient, @name, "client")
+				puts node.config
+				node.run
+				node.destroy_item(Chef::Node, @name, "node")
+				node.destroy_item(Chef::ApiClient, @name, "client")
 			end
 
 			def set_role
@@ -114,7 +120,7 @@ module Provider
 				knife_ssh.config[:manual] 			= manual
 				knife_ssh.config[:ssh_user] 		= @ssh_user
 				knife_ssh.config[:identity_file] 	= @identity_file
-				knife_ssh.config[:log_level] 		= :debug
+				knife_ssh.config[:log_level] 		= @verbose
 
 				knife_ssh.name_args = [query, cmd_line]
 				sys_status =  knife_ssh.run

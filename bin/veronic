@@ -84,9 +84,19 @@ opt_parser = OptionParser.new do |opt|
     options[:security_groups] = s
   end
 
+  options[:ami_image] = ENV['ami_image']
+  opt.on("-I","--ami_image ami_image","Which ami_image use for the box") do |i|
+    options[:ami_image] = i
+  end
+
   options[:deploy_cmd] = ENV['deploy_cmd']
   opt.on("-D","--deploy_cmd security_groups","Which command line us to deploy the box") do |dc|
     options[:deploy_cmd] = dc
+  end
+
+  options[:verbose] = ENV['verbose']
+  opt.on("-v","--verbose debug","Which verbose level us to deploy the box") do |v|
+    options[:verbose] = v
   end
 
   opt.on("-h","--help","help")

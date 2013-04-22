@@ -20,5 +20,7 @@ ssh_user:
 ssh_port:
 role:
 flavor:
+ami_image: 
 security_groups: 
 deploy_cmd: 
+verbose: 

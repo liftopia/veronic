@@ -54,7 +54,7 @@ module Veronic
 				deploy_stacks
 			end
 			query = cloudprovider.instance.dns_name
-			deploy_cmd = 'sudo chef-client -o "recipe[lift_envs::app_deploy]" -l debug'
+			deploy_cmd = "sudo chef-client -o 'recipe[lift_envs::app_deploy]' #{@config.verbose ? '-l ' + @config.verbose : ''}"
 			manual = true
 			configprovider.ssh(query, deploy_cmd, manual)
 		end
@@ -65,16 +65,16 @@ module Veronic
 				deploy_apps
 			end
 			query = cloudprovider.instance.dns_name
-			deploy_cmd = 'sudo chef-client -o "recipe[lift_envs::app_testing]" -l debug'
+			deploy_cmd = "sudo chef-client -o 'recipe[lift_envs::app_testing]' #{@config.verbose ? '-l ' + @config.verbose : ''}"
 			manual = true
 			configprovider.ssh(query, deploy_cmd, manual)
 		end
 
 		def destroy
-			config_hash[:dnsprovider_zones].each do |z|
+			@config.dnsprovider_zones.each do |z|
 				@config.zone_name 	= z['zone_name']
 				@config.zone_url 	= z['zone_url']
-				dns 				= "#{config_hash[:name]}.#{z['zone_name']}"
+				dns 				= "#{@config.name}.#{z['zone_name']}"
 				puts 				"Setting DNS #{dns} ..."
 				record 				= dnsprovider.zone.record(dns, [], "A", "1").delete
 				puts 				"DNS #{dns} deleted"
@@ -101,10 +101,10 @@ module Veronic
 		end
 
 		def update_instance_dns
-			config_hash[:dnsprovider_zones].each do |z|
+			@config.dnsprovider_zones.each do |z|
 				@config.zone_name 	= z['zone_name']
 				@config.zone_url 	= z['zone_url']
-				dns 				= "#{config_hash[:name]}.#{z['zone_name']}"
+				dns 				= "#{@config.name}.#{z['zone_name']}"
 				puts 				"Setting DNS #{dns} ..."
 				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.public_ip_address], "A", "1").wait_set
 				puts 				"DNS #{dns} updated"
@@ -126,7 +126,7 @@ module Veronic
 		end
 
 		def status
-			if config_hash[:name]
+			if @config.name
 				return cloudprovider.instance.status
 			else
 				return "Arguments name missing"
@@ -136,7 +136,7 @@ module Veronic
 		def bootstrap
 			get_image
 			if cloudprovider.instance.status == :running
-				puts "#{config_hash[:name]} is running"		
+				puts "#{@config.name} is running"		
 			elsif cloudprovider.instance.status == :stopped
 				start
 			elsif cloudprovider.instance.exist? == false
@@ -152,7 +152,7 @@ module Veronic
 		end
 
 		def set_node
-			if config_hash[:role] && config_hash[:environment]
+			if @config.role && @config.environment
 				configprovider.instance.set_environment
 				configprovider.instance.set_role
 			else
@@ -161,7 +161,13 @@ module Veronic
 		end
 
 		def get_image
-			@config.image = cloudprovider.image.id
+			unless @config.image
+				unless @config.environment
+					abort('Arguments "environment" missing') 
+				else
+					@config.image = cloudprovider.image.id
+				end
+			end
 		end
 	end
 end

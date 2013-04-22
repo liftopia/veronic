@@ -22,7 +22,7 @@ module Provider
 			Chef::Config[:validation_key] 			= config[:validation_key]
 			Chef::Config[:chef_server_url] 			= config[:chef_server_url]
 			Chef::Config[:ssl_version]				= config[:ssl_version]
-			Chef::Config[:log_level] 				= :debug
+			Chef::Config[:log_level] 				= config[:verbose]
 			@knife = knife
 		end
 

@@ -53,7 +53,7 @@ module Provider
 			end
 
 			def status
-				@instance.status
+				@instance.status if @instance
 			end
 
 			def dns_name
@@ -65,11 +65,11 @@ module Provider
 			end
 
 			def id
-				@id ||= get_instance.id
+				@instance.id
 			end
 
 			def instance
-				@ec2.instances[id]
+				@instance ||= get_instance
 			end
 
 			def get_instance
