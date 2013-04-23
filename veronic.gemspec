@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'veronic'
-  s.version     = '0.0.11'
+  s.version     = '0.0.12'
   s.date        = '2013-04-05'
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.summary     = "Veronic, deux qui la tiennent trois qui la niquent"

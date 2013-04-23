@@ -155,8 +155,8 @@ module Veronic
 			unless @config.environment
 				abort('Arguments "environment" missing') 
 			else
-				configprovider.instance.client.destroy
 				configprovider.instance.delete_client_key(cloudprovider.instance.dns_name)
+				configprovider.instance.client.destroy
 				cloudprovider.image.detroy
 				cloudprovider.instance.create_image
 			end
