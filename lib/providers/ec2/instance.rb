@@ -2,9 +2,10 @@ module Provider
 	class Ec2
 		class Instance
 
-			def initialize(ec2, name)
+			def initialize(ec2, name, environment)
 				@ec2 = ec2
 				@name = name
+				@environment = environment
 		       	@instance = instance
 		    end
 
@@ -76,6 +77,22 @@ module Provider
 				AWS.memoize do
 					@ec2.instances.select {|x| x.tags['Name'] == @name && x.status != :shutting_down && x.status != :terminated}.first
 				end
+			end
+
+			def create_image(name=nil)
+				@ami_name = name || @environment + '-ami'
+				puts "Create image #{@ami_name}"
+				image = @instance.create_image(@ami_name, { :no_reboot => true })
+				while image.exists? == false && image.state != :failed
+					print "."
+					sleep 1
+				end
+				while image.state == :pending && image.state != :failed
+					print "."
+					sleep 1
+				end
+				puts ""
+				return image
 			end
 					
 		end

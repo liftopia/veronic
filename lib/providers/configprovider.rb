@@ -20,4 +20,8 @@ class ConfigProvider
 	def instance
 		@provider.instance
 	end
+
+	def client
+		@provider.client
+	end
 end

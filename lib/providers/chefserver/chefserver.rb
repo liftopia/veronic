@@ -7,7 +7,19 @@ require 'tempfile'
 require 'highline'
 require 'net/ssh'
 require 'net/ssh/multi'
+require 'chef/knife'
+require 'chef/knife/ec2_server_create'
+require 'chef/knife/ec2_server_delete'
+require 'chef/knife/bootstrap'
+require 'chef/knife/ssh'
+require 'chef/knife/node_run_list_add'
+require 'chef/knife/core/bootstrap_context'
+require 'chef/knife/ec2_base'
+require 'chef/node'
+
+require_relative 'rest_request'
 require_relative 'instance'
+require_relative 'client'
 
 module Provider
 	class ChefServer
@@ -47,7 +59,11 @@ module Provider
 		end
 
 		def instance
-			instance = Provider::ChefServer::Instance.new(@config)
+			node = Provider::ChefServer::Instance.new(@config)
+		end
+
+		def client
+			node = Provider::ChefServer::Client.new(@config)
 		end
 		
 	end

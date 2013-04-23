@@ -134,21 +134,32 @@ module Veronic
 		end
 
 		def bootstrap
-			get_image
+			status = false
 			if cloudprovider.instance.status == :running
-				puts "#{@config.name} is running"		
+				puts "#{@config.name} is running"	
 			elsif cloudprovider.instance.status == :stopped
 				start
 			elsif cloudprovider.instance.exist? == false
+				get_image
 				configprovider.instance.bootstrap 
-				set_node
 				update_instance_dns
-				return true
+				status = true
 			else
 				abort('Error during connecting instance')  
 			end
 			set_node
-			return false
+			return status
+		end
+
+		def create_image
+			unless @config.environment
+				abort('Arguments "environment" missing') 
+			else
+				configprovider.instance.client.destroy
+				configprovider.instance.delete_client_key(cloudprovider.instance.dns_name)
+				cloudprovider.image.detroy
+				cloudprovider.instance.create_image
+			end
 		end
 
 		def set_node
@@ -161,12 +172,14 @@ module Veronic
 		end
 
 		def get_image
-			unless @config.image
+			if @config.image.nil?
 				unless @config.environment
 					abort('Arguments "environment" missing') 
 				else
 					@config.image = cloudprovider.image.id
 				end
+			else
+				@config.image = cloudprovider.image(@config.image).id
 			end
 		end
 	end

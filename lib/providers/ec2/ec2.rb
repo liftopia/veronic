@@ -14,12 +14,12 @@ module Provider
 			@ec2 				= ec2
 		end
 
-		def image
-			Provider::Ec2::Image.new(@ec2, @environment, @owner_id)
+		def image(name=nil)
+			Provider::Ec2::Image.new(@ec2, @environment, @owner_id, name)
 		end
 
 		def instance
-			Provider::Ec2::Instance.new(@ec2, @name)
+			Provider::Ec2::Instance.new(@ec2, @name, @environment)
 		end
 
 		def instances

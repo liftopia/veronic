@@ -1,15 +1,3 @@
-require 'chef/knife'
-require 'chef/knife/ec2_server_create'
-require 'chef/knife/ec2_server_delete'
-require 'chef/knife/bootstrap'
-require 'chef/knife/ssh'
-require 'chef/knife/node_run_list_add'
-require 'chef/knife/core/bootstrap_context'
-require 'chef/knife/ec2_base'
-require 'chef/node'
-
-require_relative 'rest_request'
-
 module Provider
 	class ChefServer
 		class Instance
@@ -126,6 +114,14 @@ module Provider
 				sys_status =  knife_ssh.run
 			end
 
+			def client
+				Provider::ChefServer::Client.new(@name)
+			end
+
+			def delete_client_key(node, client_key="/etc/chef/client.pem")
+				puts "Deleting client_key #{client_key}"
+				self.ssh(node, "sudo rm -f #{client_key}", true)
+			end
 		end
 	end
 end

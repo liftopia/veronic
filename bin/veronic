@@ -26,6 +26,7 @@ opt_parser = OptionParser.new do |opt|
   opt.separator  "     start: start box"
   opt.separator  "     list: list boxes"
   opt.separator  "     status: status boxes"
+  opt.separator  "     create_image: create an image with the box"
   opt.separator  ""
   opt.separator  "Options"
 
@@ -90,7 +91,7 @@ opt_parser = OptionParser.new do |opt|
   end
 
   options[:deploy_cmd] = ENV['deploy_cmd']
-  opt.on("-D","--deploy_cmd security_groups","Which command line us to deploy the box") do |dc|
+  opt.on("-D","--deploy_cmd commad-line","Which command line us to deploy the box") do |dc|
     options[:deploy_cmd] = dc
   end
 
@@ -129,6 +130,9 @@ when "list"
   Veronic::Deployer.new(options).instances_list
 when "status"
   puts Veronic::Deployer.new(options).status
+when "create_image"
+  image = Veronic::Deployer.new(options).create_image
+  puts "ID: #{image.id}", "NAME: #{image.name}", "STATE: #{image.state}"
 else
 	puts opt_parser
 end

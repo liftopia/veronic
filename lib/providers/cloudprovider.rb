@@ -13,8 +13,8 @@ class CloudProvider
 		CLOUDPROVIDERS[@config[:cloudprovider]].new(@config)
 	end
 
-	def image
-		@provider.image
+	def image(name=nil)
+		@provider.image(name)
 	end
 
 	def instance
