@@ -120,7 +120,7 @@ module Provider
 
 			def delete_client_key(node, client_key="/etc/chef/client.pem")
 				puts "Deleting client_key #{client_key}"
-				self.ssh(node, "sudo chef-client && sudo rm -f #{client_key}", true)
+				self.ssh(node, "sudo chef-client -W ; sudo rm -f #{client_key}", true)
 			end
 		end
 	end
