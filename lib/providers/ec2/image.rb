@@ -21,6 +21,7 @@ module Provider
 				if image
 					begin
 						@image.deregister
+						sleep 5
 						puts "Image #{@ami_name} destroyed"
 					rescue
 						return false
