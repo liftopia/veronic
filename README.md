@@ -1,7 +1,7 @@
 Veronic
 =======
 
-Veronic, deux qui la tiennent trois qui la niquent is a simple cloud deployer
+Veronic, a simple cloud deployer
 
 1) Create veronic directory:
 
