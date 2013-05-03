@@ -3,28 +3,28 @@ module Provider
 		class Instance
 
 			def initialize(config)
-				@access_key_id									= config[:cloudprovider_access_key_id]
-				@secret_access_key								= config[:cloudprovider_secret_access_key]
-				@name											= config[:name]
-				@image 											= config[:image]
-				@security_groups								= config[:security_groups]
-				@ssh_user										= config[:ssh_user]
-				@ssh_port										= config[:ssh_port]
-				@identity_file									= config[:identity_file]
-				@aws_ssh_key_id									= config[:aws_ssh_key_id]
-				@environment									= config[:environment]
-				@roles											= "role[#{config[:role]}]"
-				@flavor											= config[:flavor]
-				@region											= config[:region]
-				@availability_zone								= config[:availability_zone]
-				@verbose 										= config[:verbose]
-				Chef::Config[:knife][:image] 					= @image
-				Chef::Config[:knife][:aws_ssh_key_id] 			= @aws_ssh_key_id
-				Chef::Config[:knife][:aws_access_key_id] 		= @access_key_id
-				Chef::Config[:knife][:aws_secret_access_key] 	= @secret_access_key
-				Chef::Config[:knife][:region]					= @region
-				Chef::Config[:knife][:availability_zone]		= @availability_zone
-				Chef::Config[:knife][:log_level] 				= :debug
+				@access_key_id                                = config[:cloudprovider_access_key_id]
+				@secret_access_key                            = config[:cloudprovider_secret_access_key]
+				@name                                         = config[:name]
+				@image                                        = config[:image]
+				@security_groups                              = config[:security_groups]
+				@ssh_user                                     = config[:ssh_user]
+				@ssh_port                                     = config[:ssh_port]
+				@identity_file                                = config[:identity_file]
+				@aws_ssh_key_id                               = config[:aws_ssh_key_id]
+				@environment                                  = config[:environment]
+				@roles                                        = "role[#{config[:role]}]"
+				@flavor                                       = config[:flavor]
+				@region                                       = config[:region]
+				@availability_zone                            = config[:availability_zone]
+				@verbose                                      = config[:verbose]
+				Chef::Config[:knife][:image]                  = @image
+				Chef::Config[:knife][:aws_ssh_key_id          = @aws_ssh_key_id
+				Chef::Config[:knife][:aws_access_key_id]      = @access_key_id
+				Chef::Config[:knife][:aws_secret_access_key]  = @secret_access_key
+				Chef::Config[:knife][:region]                 = @region
+				Chef::Config[:knife][:availability_zone]      = @availability_zone
+				Chef::Config[:knife][:log_level]              = @verbose
 			end
 
 			def create
@@ -32,16 +32,16 @@ module Provider
 				
 				node = Chef::Knife::Ec2ServerCreate.new()
 
-				node.config[:run_list]        	= [@roles]
-				node.config[:image]           	= @image
-				node.config[:flavor]          	= @flavor
-				node.config[:security_groups] 	= @security_groups
-				node.config[:ssh_user]        	= @ssh_user
-				node.config[:ssh_port]        	= @ssh_port
-				node.config[:chef_node_name]  	= @name
-				node.config[:identity_file]		= @identity_file
-				node.config[:environment]		= @environment
-				node.config[:log_level] 		= @verbose
+				node.config[:run_list]          = [@roles]
+				node.config[:image]             = @image
+				node.config[:flavor]            = @flavor
+				node.config[:security_groups]   = @security_groups
+				node.config[:ssh_user]          = @ssh_user
+				node.config[:ssh_port]          = @ssh_port
+				node.config[:chef_node_name]    = @name
+				node.config[:identity_file]     = @identity_file
+				node.config[:environment]       = @environment
+				node.config[:log_level]         = @verbose
 
 				puts node.config
 				node.run
@@ -52,15 +52,15 @@ module Provider
 				
 				node = Chef::Knife::Ec2ServerCreate.new()
 
-				node.config[:image]           	= @image
-				node.config[:flavor]          	= @flavor
-				node.config[:security_groups] 	= @security_groups
-				node.config[:ssh_user]        	= @ssh_user
-				node.config[:ssh_port]        	= @ssh_port
-				node.config[:chef_node_name]  	= @name
-				node.config[:identity_file]		= @identity_file
-				node.config[:environment]		= @environment
-				node.config[:log_level] 		= @verbose
+				node.config[:image]             = @image
+				node.config[:flavor]            = @flavor
+				node.config[:security_groups]   = @security_groups
+				node.config[:ssh_user]          = @ssh_user
+				node.config[:ssh_port]          = @ssh_port
+				node.config[:chef_node_name]    = @name
+				node.config[:identity_file]     = @identity_file
+				node.config[:environment]       = @environment
+				node.config[:log_level]         = @verbose
 
 				puts node.config
 				begin
@@ -77,10 +77,10 @@ module Provider
 
 				node = Chef::Knife::Ec2ServerDelete.new()
 
-				node.config[:purge]        		= true
-				node.config[:chef_node_name]	= @name
-				node.config[:yes]				= true
-				node.name_args 					= instance_ids
+				node.config[:purge]           = true
+				node.config[:chef_node_name]  = @name
+				node.config[:yes]             = true
+				node.name_args                = instance_ids
 
 				puts node.config
 				node.run
@@ -106,10 +106,10 @@ module Provider
 			def ssh(query, cmd_line, manual)
 				knife_ssh = Chef::Knife::Ssh.new()
 
-				knife_ssh.config[:manual] 			= manual
-				knife_ssh.config[:ssh_user] 		= @ssh_user
-				knife_ssh.config[:identity_file] 	= @identity_file
-				knife_ssh.config[:log_level] 		= @verbose
+				knife_ssh.config[:manual]         = manual
+				knife_ssh.config[:ssh_user]       = @ssh_user
+				knife_ssh.config[:identity_file]  = @identity_file
+				knife_ssh.config[:log_level]      = @verbose
 
 				knife_ssh.name_args = [query, cmd_line]
 				sys_status =  knife_ssh.run

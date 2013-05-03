@@ -25,16 +25,16 @@ module Provider
 	class ChefServer
 
 		def initialize(config)
-			@path 									= File.dirname($0)
-			@config 								= config
-			Chef::Config[:environment] 				= config[:environment]
-			Chef::Config[:node_name] 				= config[:node_name]
-			Chef::Config[:client_key] 				= config[:client_key]
-			Chef::Config[:validation_client_name] 	= config[:validation_client_name]
-			Chef::Config[:validation_key] 			= config[:validation_key]
-			Chef::Config[:chef_server_url] 			= config[:chef_server_url]
-			Chef::Config[:ssl_version]				= config[:ssl_version]
-			Chef::Config[:log_level] 				= config[:verbose]
+			@path                                  = File.dirname($0)
+			@config                                = config
+			Chef::Config[:environment]             = config[:environment]
+			Chef::Config[:node_name]               = config[:node_name]
+			Chef::Config[:client_key]              = config[:client_key]
+			Chef::Config[:validation_client_name]  = config[:validation_client_name]
+			Chef::Config[:validation_key]          = config[:validation_key]
+			Chef::Config[:chef_server_url]         = config[:chef_server_url]
+			Chef::Config[:ssl_version]             = config[:ssl_version]
+			Chef::Config[:log_level]               = config[:verbose]
 			@knife = knife
 		end
 
