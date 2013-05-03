@@ -32,29 +32,29 @@ module Provider
 
 			def image
 				puts "Getting image #{@ami_name}..."
-				@image = get_image
-				unless @image
-					sleep 5
-					@image = get_image
-				end
-				if @image
-					while @image.exists? == false && @image.state != :failed
+				@image ||= get_image
+			end
+
+			def get_image
+				images = @ec2.images
+				my_image = images.with_owner(@owner_id).select {|x| x.name == @ami_name}.first
+				unless my_image
+					my_image = images[@name]
+					unless my_image.exists?
+						return false
+					end
+				else
+					while my_image.exists? == false && my_image.state != :failed
 						print "."
 						sleep 1
 					end
-					while @image.state == :pending && @image.state != :failed
+					while my_image.state == :pending && my_image.state != :failed
 						print "."
 						sleep 1
 					end
 					puts ""
-					return @image
-				else
-					return false
 				end
-			end
-
-			def get_image
-				@ec2.images.with_owner(@owner_id).select {|x| x.name == @ami_name}.first
+				return my_image
 			end
 
 		end

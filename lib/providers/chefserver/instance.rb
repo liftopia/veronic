@@ -66,12 +66,13 @@ module Provider
 				begin
 					node.run
 				rescue
+					puts "Creation of #{@name} failed"
 					self.destroy([node.server.id])
 					self.bootstrap(recursive_count+=1) if recursive_count < 3
 				end
 			end
 
-			def destroy(instance_ids = [])
+			def destroy(instance_ids=[])
 				puts "Deleting ec2 server #{@name} ..."
 
 				node = Chef::Knife::Ec2ServerDelete.new()

@@ -88,16 +88,13 @@ module Veronic
 		end
 
 		def deploy
-			if cloudprovider.instance.exist?
-				if @environment == 'branch'
-					query = cloudprovider.instance.dns_name
-					manual = true
-				else
-					query = "role:#{@role}"
-					manual = false
-				end
-				configprovider.ssh(query, @deploy_cmd, manual)
-			end
+			unless @config.deploy_cmd
+				abort('Arguments --deploy_cmd is missing')
+			end 
+			bootstrap
+			query = cloudprovider.instance.dns_name
+			manual = true
+			configprovider.ssh(query, @config.deploy_cmd, manual)
 		end
 
 		def update_instance_dns
@@ -129,7 +126,7 @@ module Veronic
 			if @config.name
 				return cloudprovider.instance.status
 			else
-				return "Arguments name missing"
+				return "Arguments --name is missing"
 			end
 		end
 
@@ -141,6 +138,7 @@ module Veronic
 				start
 			elsif cloudprovider.instance.exist? == false
 				get_image
+				configprovider.instance.client.destroy
 				configprovider.instance.bootstrap 
 				update_instance_dns
 				status = true
@@ -153,7 +151,7 @@ module Veronic
 
 		def create_image
 			unless @config.environment
-				abort('Arguments "environment" missing') 
+				abort('Arguments --environment is missing') 
 			else
 				configprovider.instance.delete_client_key(cloudprovider.instance.dns_name)
 				configprovider.instance.client.destroy
@@ -167,14 +165,14 @@ module Veronic
 				configprovider.instance.set_environment
 				configprovider.instance.set_role
 			else
-				abort('Arguments "role" or "environment" missing') 
+				abort('Arguments --role or --environment is missing') 
 			end
 		end
 
 		def get_image
 			if @config.image.nil?
 				unless @config.environment
-					abort('Arguments "environment" missing') 
+					abort('Arguments --environment is missing') 
 				else
 					@config.image = cloudprovider.image.id
 				end
