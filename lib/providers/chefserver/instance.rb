@@ -19,7 +19,7 @@ module Provider
 				@availability_zone                            = config[:availability_zone]
 				@verbose                                      = config[:verbose]
 				Chef::Config[:knife][:image]                  = @image
-				Chef::Config[:knife][:aws_ssh_key_id          = @aws_ssh_key_id
+				Chef::Config[:knife][:aws_ssh_key_id]         = @aws_ssh_key_id
 				Chef::Config[:knife][:aws_access_key_id]      = @access_key_id
 				Chef::Config[:knife][:aws_secret_access_key]  = @secret_access_key
 				Chef::Config[:knife][:region]                 = @region
@@ -67,7 +67,7 @@ module Provider
 					node.run
 				rescue
 					puts "Creation of #{@name} failed"
-					self.destroy([node.server.id])
+					self.destroy([node.server.id]) if node.server
 					self.bootstrap(recursive_count+=1) if recursive_count < 3
 				end
 			end

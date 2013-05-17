@@ -36,25 +36,26 @@ module Provider
 			end
 
 			def get_image
-				images = @ec2.images
-				my_image = images.with_owner(@owner_id).select {|x| x.name == @ami_name}.first
-				unless my_image
-					my_image = images[@name]
-					unless my_image.exists?
-						return false
+				AWS.memoize do
+					my_image = @ec2.images.with_owner(@owner_id).select {|x| x.name == @ami_name}.first
+					unless my_image
+						my_image = @ec2.images[@ami_name]
+						unless my_image.exists?
+							return false
+						end
+					else
+						while my_image.exists? == false && my_image.state != :failed
+							print "."
+							sleep 1
+						end
+						while my_image.state == :pending && my_image.state != :failed
+							print "."
+							sleep 1
+						end
+						puts ""
 					end
-				else
-					while my_image.exists? == false && my_image.state != :failed
-						print "."
-						sleep 1
-					end
-					while my_image.state == :pending && my_image.state != :failed
-						print "."
-						sleep 1
-					end
-					puts ""
+					return my_image
 				end
-				return my_image
 			end
 
 		end

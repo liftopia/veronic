@@ -7,6 +7,7 @@ module Provider
 
 		def initialize(config)
 			@name                = config[:name]
+			@region              = config[:region] 
 			@environment         = config[:environment]
 			@access_key_id       = config[:cloudprovider_access_key_id]
 			@secret_access_key   = config[:cloudprovider_secret_access_key]
@@ -29,7 +30,7 @@ module Provider
 		end
 
 		def ec2
-			AWS::EC2.new(:access_key_id => @access_key_id, :secret_access_key => @secret_access_key)
+			AWS::EC2.new(:access_key_id => @access_key_id, :secret_access_key => @secret_access_key, :region => @region)
 		end
 
 	end

@@ -44,7 +44,7 @@ module Veronic
 		def deploy_stacks
 			bootstrap
 			query = cloudprovider.instance.dns_name
-			deploy_cmd = 'sudo chef-client -l debug'
+			deploy_cmd = "sudo chef-client #{@config.verbose ? '-l ' + @config.verbose : ''}"
 			manual = true
 			configprovider.ssh(query, deploy_cmd, manual)
 		end

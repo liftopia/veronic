@@ -13,7 +13,7 @@ module Veronic
 			@dnsprovider_secret_access_key    = options[:dnsprovider_secret_access_key]    || config_from_file['dnsprovider_secret_access_key']
 			@dnsprovider_zones                = options[:dnsprovider_zones]                || config_from_file['dnsprovider_zones']
 			@cloudprovider_access_key_id      = options[:cloudprovider_access_key_id]      || config_from_file['cloudprovider_access_key_id']
-			@cloudprovider_secret_access_key  = options[:cloudprovider_secret_access_key   || config_from_file['cloudprovider_secret_access_key']
+			@cloudprovider_secret_access_key  = options[:cloudprovider_secret_access_key]  || config_from_file['cloudprovider_secret_access_key']
 			@cloudprovider_images_owner_id    = options[:cloudprovider_images_owner_id]    || config_from_file['cloudprovider_images_owner_id']
 			@region                           = options[:region]                           || config_from_file['region']
 			@availability_zone                = options[:availability_zone]                || config_from_file['availability_zone']
