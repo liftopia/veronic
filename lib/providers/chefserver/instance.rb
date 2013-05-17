@@ -65,10 +65,19 @@ module Provider
 				puts node.config
 				begin
 					node.run
-				rescue
+				rescue => e
 					puts "Creation of #{@name} failed"
+					puts "Message: " + e.inspect
+					puts "Stacktrace:#{e.backtrace.map {|l| "  #{l}\n"}.join}"
+				ensure
 					self.destroy([node.server.id]) if node.server
-					self.bootstrap(recursive_count+=1) if recursive_count < 3
+					if recursive_count < 10
+						puts "Creation of #{@name} retrying #{recursive_count}"
+						self.bootstrap(recursive_count+=1) 
+					else
+						puts "Creation of #{@name} failed after #{recursive_count} retry"
+						exit 1
+					end
 				end
 			end
 
