@@ -2,26 +2,25 @@ module Provider
 	class Ec2
 		class Instance
 
-			def initialize(ec2, name, environment)
+			def initialize(ec2, name, image)
 				@ec2 = ec2
 				@name = name
-				@environment = environment
-		       	@instance = instance
-		    end
+		    @instance = instance
+		    @image = image
+		  end
 
 			def stop
 				print "Stopping instance #{@name}..."
 				if self.exist?
 					@instance.stop
-					@i = 0
+					i = 0
 					while self.status != :stopped
-						if @i > 120 
-							return false
-						end
-						print "." ; sleep 3 ; @i += 1
+            print "." ; sleep 3 ; i += 1
+						return false if i > 120
 					end
+          puts "\nInstance #{@name} is stopped"
 				end
-				puts "\nInstance #{@name} is stopped"
+				return true
 			end
 
 			def start
@@ -31,15 +30,14 @@ module Provider
 						sleep 2
 					end
 					@instance.start
-					@i = 0 					
+					i = 0 					
 					while self.status != :running
-						if @i > 120 
-							return false
-						end
-						print "." ; sleep 3 ; @i += 1
+						print "." ; sleep 3 ; i += 1
+						return false if i > 120
 					end
+          puts "\nInstance #{@name} is started"
 				end
-				puts "\nInstance #{@name} is started"
+        return true
 			end
 
 			def exist?
@@ -79,8 +77,8 @@ module Provider
 				end
 			end
 
-			def create_image(name=nil)
-				@ami_name = name || @environment + '-ami'
+			def create_image
+				@ami_name = @image || @name
 				puts "Create image #{@ami_name}"
 				image = @instance.create_image(@ami_name, { :no_reboot => true })
 				while image.exists? == false && image.state != :failed
@@ -93,6 +91,14 @@ module Provider
 				end
 				puts ""
 				return image
+			end
+
+			def tags(hash={})
+				puts "Tagging instance ..."
+				hash.keys.each do |k|
+					puts k + ': ' + hash[k]
+					@instance.tags[k] = hash[k]
+				end
 			end
 					
 		end

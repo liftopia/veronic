@@ -97,13 +97,22 @@ module Veronic
 			configprovider.ssh(query, @config.deploy_cmd, manual)
 		end
 
+		def search_and_deploy
+			unless @config.deploy_cmd || @config.query
+				abort('Arguments --deploy_cmd or --query is missing')
+			end 
+			query = @config.query
+			manual = false
+			configprovider.ssh(query, @config.deploy_cmd, manual)
+		end
+
 		def update_instance_dns
 			@config.dnsprovider_zones.each do |z|
 				@config.zone_name 	= z['zone_name']
 				@config.zone_url 	= z['zone_url']
 				dns 				= "#{@config.name}.#{z['zone_name']}"
 				puts 				"Setting DNS #{dns} ..."
-				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.public_ip_address], "A", "1").wait_set
+				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.dns_name], "CNAME", "1").wait_set
 				puts 				"DNS #{dns} updated"
 			end
 		end
@@ -118,7 +127,7 @@ module Veronic
 
 		def start
 			unless cloudprovider.instance.start == false
-				update_instance_dns
+				exit 1
 			end
 		end
 
@@ -137,10 +146,10 @@ module Veronic
 			elsif cloudprovider.instance.status == :stopped
 				start
 			elsif cloudprovider.instance.exist? == false
+				@config.availability_zone = get_availability_zone
 				get_image
 				configprovider.instance.client.destroy
 				configprovider.instance.bootstrap 
-				update_instance_dns
 				status = true
 			else
 				abort('Error during connecting instance')  
@@ -150,20 +159,21 @@ module Veronic
 		end
 
 		def create_image
-			unless @config.environment
-				abort('Arguments --environment is missing') 
-			else
-				configprovider.instance.delete_client_key(cloudprovider.instance.dns_name)
-				configprovider.instance.client.destroy
-				cloudprovider.image.detroy
-				cloudprovider.instance.create_image
-			end
+			configprovider.instance.delete_client_key(cloudprovider.instance.dns_name)
+			configprovider.instance.client.destroy
+			cloudprovider.image.detroy
+			cloudprovider.instance.create_image
 		end
 
 		def set_node
+			update_instance_dns
 			if @config.role && @config.environment
 				configprovider.instance.set_environment
 				configprovider.instance.set_role
+				cloudprovider.instance.tags({'role' => @config.role, 'environment' => @config.environment})
+				if configprovider.instance.delete_client_key(cloudprovider.instance.dns_name)
+					configprovider.instance.client.destroy
+				end
 			else
 				abort('Arguments --role or --environment is missing') 
 			end
@@ -171,13 +181,36 @@ module Veronic
 
 		def get_image
 			if @config.image.nil?
-				unless @config.environment
-					abort('Arguments --environment is missing') 
-				else
-					@config.image = cloudprovider.image.id
-				end
+				abort('Arguments --ami_image is missing') 
 			else
-				@config.image = cloudprovider.image(@config.image).id
+				@config.image = cloudprovider.image.id
+			end
+		end
+
+		def get_availability_zone
+			puts "Getting availability zone ..."
+			environments = {}
+			if @config.availability_zone.nil? || @config.availability_zone == 'auto'
+				cloudprovider.regions.each do |region|
+					region.instances.each do |instance|
+						if instance.tags[:environment] && instance.tags[:role] && instance.status != :shutting_down && instance.status != :terminated
+							environments[instance.tags[:environment]] = {} unless environments[instance.tags[:environment]]
+							environments[instance.tags[:environment]][instance.tags[:role]] = {} unless environments[instance.tags[:environment]][instance.tags[:role]]
+							environments[instance.tags[:environment]][instance.tags[:role]][region.name] = {} unless environments[instance.tags[:environment]][instance.tags[:role]][region.name]
+							region.availability_zones.each do |availability_zone|
+								environments[instance.tags[:environment]][instance.tags[:role]][region.name][availability_zone.name] = [] unless environments[instance.tags[:environment]][instance.tags[:role]][region.name][availability_zone.name]
+							end
+							environments[instance.tags[:environment]][instance.tags[:role]][region.name][instance.availability_zone] << instance.id
+						end
+					end
+				end
+			end
+			if environments[@config.environment] && environments[@config.environment][@config.role] && environments[@config.environment][@config.role][@config.region]
+				availability_zones = environments[@config.environment][@config.role][@config.region].sort_by { |availability_zone| availability_zone[1].count }
+				puts "Zones: " + availability_zones.to_s
+				availability_zone = availability_zones.first
+				puts "Zone selected: " + availability_zone[0]
+				availability_zone[0]
 			end
 		end
 	end

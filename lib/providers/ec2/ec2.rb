@@ -8,19 +8,20 @@ module Provider
 		def initialize(config)
 			@name                = config[:name]
 			@region              = config[:region] 
-			@environment         = config[:environment]
+			@role                = config[:role]
 			@access_key_id       = config[:cloudprovider_access_key_id]
 			@secret_access_key   = config[:cloudprovider_secret_access_key]
 			@owner_id            = config[:cloudprovider_images_owner_id]
+			@image               = config[:image]
 			@ec2                 = ec2
 		end
 
-		def image(name=nil)
-			Provider::Ec2::Image.new(@ec2, @environment, @owner_id, name)
+		def image
+			Provider::Ec2::Image.new(@ec2, @role, @owner_id, @image)
 		end
 
 		def instance
-			Provider::Ec2::Instance.new(@ec2, @name, @environment)
+			Provider::Ec2::Instance.new(@ec2, @name, @image)
 		end
 
 		def instances
@@ -29,8 +30,16 @@ module Provider
 			end
 		end
 
+		def regions
+			AWS.memoize do
+				@ec2.regions
+			end
+		end
+
 		def ec2
-			AWS::EC2.new(:access_key_id => @access_key_id, :secret_access_key => @secret_access_key, :region => @region)
+			AWS.memoize do
+				AWS::EC2.new(:access_key_id => @access_key_id, :secret_access_key => @secret_access_key, :region => @region)
+			end
 		end
 
 	end

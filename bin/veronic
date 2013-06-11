@@ -18,6 +18,7 @@ opt_parser = OptionParser.new do |opt|
   opt.separator  "     bootstrap: bootstrap box"
   opt.separator  "     destroy: destroy box"
   opt.separator  "     deploy: deploy box"
+  opt.separator  "     search_and_deploy: search & deploy box"
   opt.separator  "     deploy_stacks: deploy stacks on box"
   opt.separator  "     deploy_apps: destroy apps on box"
   opt.separator  "     run_tests: tests apps on box"
@@ -80,7 +81,7 @@ opt_parser = OptionParser.new do |opt|
     options[:dnsprovider_zone_name] = d
   end
 
-  options[:security_groups] = ENV['security_groups']
+  options[:security_groups] = ENV['security_groups'] || 'default'
   opt.on("-S","--security_groups security_groups","Which security groups use for the box") do |s|
     options[:security_groups] = s
   end
@@ -93,6 +94,11 @@ opt_parser = OptionParser.new do |opt|
   options[:deploy_cmd] = ENV['deploy_cmd']
   opt.on("-D","--deploy_cmd commad-line","Which command line us to deploy the box") do |dc|
     options[:deploy_cmd] = dc
+  end
+
+  options[:query] = ENV['query']
+  opt.on("-q","--query query-line","Which query line us to deploy the boxes") do |q|
+    options[:query] = q
   end
 
   options[:verbose] = ENV['verbose']
@@ -114,6 +120,8 @@ when "destroy"
 	Veronic::Deployer.new(options).destroy
 when "deploy"
   Veronic::Deployer.new(options).deploy
+when "search_and_deploy"
+  Veronic::Deployer.new(options).search_and_deploy
 when "deploy_stacks"
   Veronic::Deployer.new(options).deploy_stacks
 when "deploy_apps"

@@ -2,11 +2,10 @@ module Provider
 	class Ec2
 		class Image
 
-			def initialize(ec2, environment, owner_id, name=nil)
+			def initialize(ec2, role, owner_id, ami_name)
 				@ec2 = ec2
-				@environment = environment
-				@name = name
-				@ami_name = @name || @environment + '-ami'
+				@role = role
+				@ami_name = ami_name
 				@owner_id = owner_id
 			end
 

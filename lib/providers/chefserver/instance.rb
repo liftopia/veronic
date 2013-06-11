@@ -13,6 +13,7 @@ module Provider
 				@identity_file                                = config[:identity_file]
 				@aws_ssh_key_id                               = config[:aws_ssh_key_id]
 				@environment                                  = config[:environment]
+        @role                                         = config[:role]
 				@roles                                        = "role[#{config[:role]}]"
 				@flavor                                       = config[:flavor]
 				@region                                       = config[:region]
@@ -69,7 +70,6 @@ module Provider
 					puts "Creation of #{@name} failed"
 					puts "Message: " + e.inspect
 					puts "Stacktrace:#{e.backtrace.map {|l| "  #{l}\n"}.join}"
-				ensure
 					self.destroy([node.server.id]) if node.server
 					if recursive_count < 10
 						puts "Creation of #{@name} retrying #{recursive_count}"
@@ -106,10 +106,10 @@ module Provider
 			def set_environment
 				node = Chef::Node.new.tap do |n|
 					n.name( @name )
-          			n.chef_environment( @environment )
-          		end
-          		node.save
-          		puts "Environment: #{@environment}"
+          n.chef_environment( @environment )
+        end
+        node.save
+        puts "Environment: #{@environment}"
 			end
 
 			def ssh(query, cmd_line, manual)
@@ -119,6 +119,15 @@ module Provider
 				knife_ssh.config[:ssh_user]       = @ssh_user
 				knife_ssh.config[:identity_file]  = @identity_file
 				knife_ssh.config[:log_level]      = @verbose
+        
+        unless manual
+          if @environment
+            query += "#{query.empty? ? '' : ' AND'} chef_environment:#{@environment}"
+          end
+          if @role
+            query += "#{query.empty? ? '' : ' AND'} role:#{@role}"
+          end
+        end
 
 				knife_ssh.name_args = [query, cmd_line]
 				sys_status =  knife_ssh.run
@@ -130,7 +139,7 @@ module Provider
 
 			def delete_client_key(node, client_key="/etc/chef/client.pem")
 				puts "Deleting client_key #{client_key}"
-				self.ssh(node, "sudo chef-client -W ; sudo rm -f #{client_key}", true)
+				self.ssh(node, "sudo chef-client -W > /dev/null ; sudo rm -f #{client_key}", true)
 			end
 		end
 	end
