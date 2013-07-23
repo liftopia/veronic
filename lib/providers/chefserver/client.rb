@@ -7,11 +7,15 @@ module Provider
 			end
 
 			def destroy(name=nil)
-				puts "Destroying client #{@name} ..."
-				
+				puts "Destroying client #{@name} from chef-server ..."
 				knife = Chef::Knife.new()
 				knife.config[:yes] = true
-				knife.delete_object(Chef::ApiClient, @name) if self.exists?
+				if self.exists?
+					knife.delete_object(Chef::ApiClient, @name)
+					puts "Client #{@name} destroy from chef-server"
+				else
+					puts "Unabled to find client #{@name}"
+				end
 			end
 
 			def exists?

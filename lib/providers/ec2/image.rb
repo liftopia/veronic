@@ -10,16 +10,16 @@ module Provider
 			end
 
 			def id
-				if image
-					@image.id
+				if get_image
+					get_image.id
 				end
 			end
 
 			def detroy
-				puts "Destroying image #{@ami_name}..."
-				if image
+				puts "Destroying image #{@ami_name} ..."
+				if get_image
 					begin
-						@image.deregister
+						get_image.deregister
 						sleep 5
 						puts "Image #{@ami_name} destroyed"
 					rescue
@@ -29,17 +29,18 @@ module Provider
 				return true
 			end
 
-			def image
-				puts "Getting image #{@ami_name}..."
-				@image ||= get_image
+			def exists?
+				get_image
 			end
 
 			def get_image
-				AWS.memoize do
+				@get_image || AWS.memoize do
+          puts "Getting image #{@ami_name}"
 					my_image = @ec2.images.with_owner(@owner_id).select {|x| x.name == @ami_name}.first
 					unless my_image
 						my_image = @ec2.images[@ami_name]
 						unless my_image.exists?
+              puts "Unabled to found image #{@ami_name}"
 							return false
 						end
 					else
@@ -53,7 +54,8 @@ module Provider
 						end
 						puts ""
 					end
-					return my_image
+          @get_image = my_image
+					return @get_image
 				end
 			end
 

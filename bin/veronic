@@ -36,6 +36,47 @@ opt_parser = OptionParser.new do |opt|
     options[:config_file] = c
   end
 
+  options[:dnsprovider] = ENV['dnsprovider']
+  opt.on("--dnsprovider","--dnsprovider r53","Use specific dnsprovider") do |dns|
+    options[:dnsprovider] = dns
+  end
+  options[:cloudprovider] = ENV['cloudprovider']
+  opt.on("--cloudprovider","--cloudprovider ec2","Use specific cloudprovider") do |cloud|
+    options[:cloudprovider] = cloud
+  end
+  options[:configprovider] = ENV['configprovider']
+  opt.on("--configprovider","--configprovider chef","Use specific configprovider") do |config|
+    options[:configprovider] = config
+  end
+  options[:dnsprovider_access_key_id] = ENV['dnsprovider_access_key_id']
+  opt.on("--dnsprovider_access_key_id","--dnsprovider_access_key_id","Use specific dnsprovider_access_key_id") do |d|
+    options[:dnsprovider_access_key_id] = d
+  end
+  options[:dnsprovider_secret_access_key] = ENV['dnsprovider_secret_access_key']
+  opt.on("--dnsprovider_secret_access_key","--dnsprovider_secret_access_key","Use specific dnsprovider_secret_access_key") do |d|
+    options[:dnsprovider_secret_access_key] = d
+  end
+  options[:dnsprovider_zones] = ENV['dnsprovider_zones']
+  opt.on("--dnsprovider_zones","--dnsprovider_zones","Use specific dnsprovider_zones") do |d|
+    options[:dnsprovider_zones] = d
+  end
+  options[:cloudprovider_access_key_id] = ENV['cloudprovider_access_key_id']
+  opt.on("--cloudprovider_access_key_id","--cloudprovider_access_key_id","Use specific cloudprovider_access_key_id") do |c|
+    options[:cloudprovider_access_key_id] = c
+  end
+  options[:cloudprovider_secret_access_key] = ENV['cloudprovider_secret_access_key']
+  opt.on("--cloudprovider_secret_access_key","--cloudprovider_secret_access_key","Use specific cloudprovider_secret_access_keye") do |c|
+    options[:cloudprovider_secret_access_key] = c
+  end
+  options[:cloudprovider_images_owner_id] = ENV['cloudprovider_images_owner_id']
+  opt.on("--cloudprovider_images_owner_id","--cloudprovider_images_owner_id","Use specific cloudprovider_images_owner_id") do |c|
+    options[:cloudprovider_images_owner_id] = c
+  end
+  options[:region] = ENV['region']
+  opt.on("--region","--region","Use specific region") do |r|
+    options[:region] = r
+  end
+
   options[:environment] = ENV['environment']
   opt.on("-E","--environment ENVIRONMENT","Which environment you want box run") do |e|
     options[:environment] = e

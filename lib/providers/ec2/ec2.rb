@@ -12,7 +12,7 @@ module Provider
 			@access_key_id       = config[:cloudprovider_access_key_id]
 			@secret_access_key   = config[:cloudprovider_secret_access_key]
 			@owner_id            = config[:cloudprovider_images_owner_id]
-			@image               = config[:image]
+			@image               = config[:image] || config[:name]
 			@ec2                 = ec2
 		end
 

@@ -3,12 +3,14 @@ module Veronic
 		attr_accessor  :dnsprovider, :cloudprovider, :configprovider, :dnsprovider_access_key_id, :dnsprovider_secret_access_key, :cloudprovider_access_key_id, :cloudprovider_secret_access_key, :cloudprovider_images_owner_id, :dnsprovider_zones, :region, :availability_zone, :aws_ssh_key_id, :node_name, :client_key, :validation_client_name, :validation_key, :chef_server_url, :ssl_version, :identity_file, :branch, :environment, :ssh_user, :ssh_port, :role, :flavor, :security_groups, :deploy_cmd, :name, :image, :zone_name, :zone_url, :verbose, :query
 
 		def initialize(options={})
-			config_file = File.exists?('/etc/veronic/veronic.yml') ? '/etc/veronic/veronic.yml' : '../../' + File.dirname($0) + '/veronic.yml'
-			config_from_file = YAML.load_file(options[:config_file] || config_file)
+			config_file = File.exists?('/etc/veronic/veronic.yml') ? '/etc/veronic/veronic.yml' : File.exists?('./veronic.yml') ? './veronic.yml' : nil
+			if config_file || File.exists?(options[:config_file])
+				config_from_file = YAML.load_file(options[:config_file] || config_file)
+			end
 
-			@dnsprovider                      = :route53
-			@cloudprovider                    = :ec2
-			@configprovider                   = :chefserver
+			@dnsprovider                      = options[:dnsprovider]                      || config_from_file['dnsprovider'] || :route53
+			@cloudprovider                    = options[:cloudprovider]                    || config_from_file['cloudprovider'] || :ec2
+			@configprovider                   = options[:configprovider]                   || config_from_file['configprovider'] || :chefserver
 			@dnsprovider_access_key_id        = options[:dnsprovider_access_key_id]        || config_from_file['dnsprovider_access_key_id']
 			@dnsprovider_secret_access_key    = options[:dnsprovider_secret_access_key]    || config_from_file['dnsprovider_secret_access_key']
 			@dnsprovider_zones                = options[:dnsprovider_zones]                || config_from_file['dnsprovider_zones']

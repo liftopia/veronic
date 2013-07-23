@@ -6,7 +6,7 @@ module Provider
 				@ec2 = ec2
 				@name = name
 		    @instance = instance
-		    @image = image
+        @ami_name = image || name
 		  end
 
 			def stop
@@ -40,7 +40,7 @@ module Provider
         return true
 			end
 
-			def exist?
+			def exists?
 				puts "Checking for ec2 server #{@name} ..."
 				if AWS.memoize do @ec2.instances.any? {|x| x.tags['Name'] == @name && x.status != :shutting_down && x.status != :terminated} end
 					puts "Instance #{@name} found"
@@ -78,19 +78,18 @@ module Provider
 			end
 
 			def create_image
-				@ami_name = @image || @name
 				puts "Create image #{@ami_name}"
-				image = @instance.create_image(@ami_name, { :no_reboot => true })
-				while image.exists? == false && image.state != :failed
+				new_image = @instance.create_image(@ami_name, { :no_reboot => true })
+				while new_image.exists? == false && new_image.state != :failed
 					print "."
 					sleep 1
 				end
-				while image.state == :pending && image.state != :failed
+				while new_image.state == :pending && new_image.state != :failed
 					print "."
 					sleep 1
 				end
 				puts ""
-				return image
+				return new_image
 			end
 
 			def tags(hash={})

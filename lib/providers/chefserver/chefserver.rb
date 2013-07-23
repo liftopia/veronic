@@ -32,14 +32,13 @@ module Provider
 			Chef::Config[:client_key]              = config[:client_key]
 			Chef::Config[:validation_client_name]  = config[:validation_client_name]
 			Chef::Config[:validation_key]          = config[:validation_key]
-			Chef::Config[:chef_server_url]         = config[:chef_server_url]
+			Chef::Config[:chef_server_url]         = config[:chef_server_url] if config[:chef_server_url]
 			Chef::Config[:ssl_version]             = config[:ssl_version]
 			Chef::Config[:log_level]               = config[:verbose]
-			@knife = knife
 		end
 
 		def knife
-			knife = Provider::ChefServer::Instance.new(@config)	
+			@knife = @knife || Provider::ChefServer::Instance.new(@config)	
 		end
 
 		def instances(query)
@@ -55,7 +54,7 @@ module Provider
 		end
 
 		def ssh(query, deploy_cmd, manual)
-			@knife.ssh(query, deploy_cmd, manual)
+			knife.ssh(query, deploy_cmd, manual)
 		end
 
 		def instance
