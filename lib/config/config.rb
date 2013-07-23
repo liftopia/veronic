@@ -33,7 +33,7 @@ module Veronic
 			@ssh_port                         = options[:ssh_port]                         || config_from_file['ssh_port']	|| 22
 			@role                             = options[:role]                             || config_from_file['role']
 			@flavor                           = options[:flavor]                           || config_from_file['flavor'] || 'm1.medium'
-			@security_groups                  = options[:security_groups].split(',')       || config_from_file['security_groups'].split(',')
+			@security_groups                  = (options[:security_groups] || 'default').split(',')       || (config_from_file['security_groups'] || 'default').split(',')
 			@deploy_cmd                       = options[:deploy_cmd]                       || config_from_file['deploy_cmd'] || 'sudo chef-client'
 			@name                             = (options[:branch] || config_from_file['branch']) ? (options[:branch] 	|| config_from_file['branch']) : (options[:name] || config_from_file['name'])
 			@image                            = options[:ami_image]                        || config_from_file['ami_image']

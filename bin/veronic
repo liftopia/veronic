@@ -178,10 +178,10 @@ when "start"
 when "list"
   Veronic::Deployer.new(options).instances_list
 when "status"
-  puts Veronic::Deployer.new(options).status
+  @logger.info Veronic::Deployer.new(options).status
 when "create_image"
   image = Veronic::Deployer.new(options).create_image
-  puts "ID: #{image.id}", "NAME: #{image.name}", "STATE: #{image.state}"
+  @logger.info "ID: #{image.id}", "NAME: #{image.name}", "STATE: #{image.state}"
 else
-	puts opt_parser
+	@logger.info opt_parser
 end

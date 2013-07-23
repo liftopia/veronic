@@ -4,17 +4,18 @@ module Provider
 
 			def initialize(name)
 				@name = name
+				@logger = Veronic::Deployer.new().logger
 			end
 
 			def destroy(name=nil)
-				puts "Destroying client #{@name} from chef-server ..."
+				@logger.info "Destroying client #{@name} from chef-server ..."
 				knife = Chef::Knife.new()
 				knife.config[:yes] = true
 				if self.exists?
 					knife.delete_object(Chef::ApiClient, @name)
-					puts "Client #{@name} destroy from chef-server"
+					@logger.info "Client #{@name} destroy from chef-server"
 				else
-					puts "Unabled to find client #{@name}"
+					@logger.info "Unabled to find client #{@name}"
 				end
 			end
 

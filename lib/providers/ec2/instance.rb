@@ -7,24 +7,25 @@ module Provider
 				@name = name
 		    @instance = instance
         @ami_name = image || name
+        @logger = Veronic::Deployer.new().logger
 		  end
 
 			def stop
-				print "Stopping instance #{@name}..."
+				@logger.info "Stopping instance #{@name}..."
 				if self.exist?
 					@instance.stop
 					i = 0
 					while self.status != :stopped
-            print "." ; sleep 3 ; i += 1
+            @logger.info "." ; sleep 3 ; i += 1
 						return false if i > 120
 					end
-          puts "\nInstance #{@name} is stopped"
+          @logger.info "\nInstance #{@name} is stopped"
 				end
 				return true
 			end
 
 			def start
-				print "Starting instance #{@name}..."
+				@logger.info "Starting instance #{@name}..."
 				if self.exist?
 					while self.status == :stopping
 						sleep 2
@@ -32,21 +33,21 @@ module Provider
 					@instance.start
 					i = 0 					
 					while self.status != :running
-						print "." ; sleep 3 ; i += 1
+						@logger.info "." ; sleep 3 ; i += 1
 						return false if i > 120
 					end
-          puts "\nInstance #{@name} is started"
+          @logger.info "\nInstance #{@name} is started"
 				end
         return true
 			end
 
 			def exists?
-				puts "Checking for ec2 server #{@name} ..."
+				@logger.info "Checking for ec2 server #{@name} ..."
 				if AWS.memoize do @ec2.instances.any? {|x| x.tags['Name'] == @name && x.status != :shutting_down && x.status != :terminated} end
-					puts "Instance #{@name} found"
+					@logger.info "Instance #{@name} found"
 					return true
 				else
-					puts "Instance #{@name} is misssing"
+					@logger.info "Instance #{@name} is misssing"
 					return false
 				end
 			end
@@ -78,24 +79,24 @@ module Provider
 			end
 
 			def create_image
-				puts "Create image #{@ami_name}"
+				@logger.info "Create image #{@ami_name}"
 				new_image = @instance.create_image(@ami_name, { :no_reboot => true })
 				while new_image.exists? == false && new_image.state != :failed
-					print "."
+					@logger.info "."
 					sleep 1
 				end
 				while new_image.state == :pending && new_image.state != :failed
-					print "."
+					@logger.info "."
 					sleep 1
 				end
-				puts ""
+				@logger.info ""
 				return new_image
 			end
 
 			def tags(hash={})
-				puts "Tagging instance ..."
+				@logger.info "Tagging instance ..."
 				hash.keys.each do |k|
-					puts k + ': ' + hash[k]
+					@logger.info k + ': ' + hash[k]
 					@instance.tags[k] = hash[k]
 				end
 			end

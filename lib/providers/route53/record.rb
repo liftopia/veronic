@@ -8,6 +8,7 @@ module Route53
 				@values = values
 				@type =  type
 				@ttl = ttl
+				@logger = Veronic::Deployer.new().logger
 			end
 			
 			def get
@@ -23,13 +24,13 @@ module Route53
 			end
 
 			def wait_set
-				print "Waitting for record { name: #{@name}, value: #{@values} }..."
+				@logger.info "Waitting for record { name: #{@name}, value: #{@values} }..."
 				while !self.match?
-					print "."
+					@logger.info "."
 					self.set
 					sleep 5
 				end
-				puts "\nRecord { name: #{@name}, value: #{@values} } updated"
+				@logger.info "\nRecord { name: #{@name}, value: #{@values} } updated"
 			end
 
 			def set

@@ -2,6 +2,7 @@ require_relative 'config/config'
 require_relative 'providers/cloudprovider'
 require_relative 'providers/dnsprovider'
 require_relative 'providers/configprovider'
+require 'logger'
 require 'pp'
 
 module Veronic
@@ -9,15 +10,16 @@ module Veronic
 
 		def initialize(options={})
 			@config = config(options)
-			@logger = logger("stderr")
+			@logger = logger
+		end
+
+		def logger
+			$stderr.sync = true
+			Logger.new($stderr)
 		end
 		
 		def config
 			@config || Veronic::Config.new
-		end
-
-		def logger(options={})
-			Veronic::Logger.new(options)
 		end
 
 		def config(options={})
@@ -80,9 +82,9 @@ module Veronic
 				@config.zone_name 	= z['zone_name']
 				@config.zone_url 	= z['zone_url']
 				dns 				= "#{@config.name}.#{z['zone_name']}"
-				@logger.message 				"Setting DNS #{dns} ..."
+				@logger.info 				"Setting DNS #{dns} ..."
 				record 				= dnsprovider.zone.record(dns, [], "A", "1").delete
-				@logger.message 				"DNS #{dns} deleted"
+				@logger.info 				"DNS #{dns} deleted"
 			end
 			if cloudprovider.instance.exists?
 				configprovider.instance.destroy([cloudprovider.instance.id])
@@ -117,12 +119,12 @@ module Veronic
   				@config.zone_name 	= z['zone_name']
   				@config.zone_url 	= z['zone_url']
   				dns 				= "#{@config.name}.#{z['zone_name']}"
-  				@logger.message 				"Setting DNS #{dns} ..."
+  				@logger.info 				"Setting DNS #{dns} ..."
   				record 				= dnsprovider.zone.record(dns, [cloudprovider.instance.dns_name], "CNAME", "1").wait_set
-  				@logger.message 				"DNS #{dns} updated"
+  				@logger.info 				"DNS #{dns} updated"
         end
       else
-        @logger.message "Unabled to update DNS"
+        @logger.info "Unabled to update DNS"
       end
 		end
 
@@ -151,7 +153,7 @@ module Veronic
 		def bootstrap
 			status = false
 			if cloudprovider.instance.status == :running
-				@logger.message "#{@config.name} is running"	
+				@logger.info "#{@config.name} is running"	
 			elsif cloudprovider.instance.status == :stopped
 				start
 			elsif cloudprovider.instance.exists? == false
@@ -184,7 +186,7 @@ module Veronic
 					configprovider.instance.client.destroy
 				end
 			else
-				@logger.message 'Unable to set_node arguments --role or --environment is missing'
+				@logger.info 'Unable to set_node arguments --role or --environment is missing'
 			end
 		end
 
@@ -197,7 +199,7 @@ module Veronic
 		end
 
 		def get_availability_zone
-			@logger.message "Getting availability zone ..."
+			@logger.info "Getting availability zone ..."
 			environments = {}
 			if @config.availability_zone.nil? || @config.availability_zone == 'auto'
 				cloudprovider.regions.each do |region|
@@ -216,9 +218,9 @@ module Veronic
 			end
 			if environments[@config.environment] && environments[@config.environment][@config.role] && environments[@config.environment][@config.role][@config.region]
 				availability_zones = environments[@config.environment][@config.role][@config.region].sort_by { |availability_zone| availability_zone[1].count }
-				@logger.message "Zones: " + availability_zones.to_s
+				@logger.info "Zones: " + availability_zones.to_s
 				availability_zone = availability_zones.first
-				@logger.message "Zone selected: " + availability_zone[0]
+				@logger.info "Zone selected: " + availability_zone[0]
 				availability_zone[0]
 			end
 		end
