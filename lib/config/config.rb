@@ -3,9 +3,12 @@ module Veronic
 		attr_accessor  :dnsprovider, :cloudprovider, :configprovider, :dnsprovider_access_key_id, :dnsprovider_secret_access_key, :cloudprovider_access_key_id, :cloudprovider_secret_access_key, :cloudprovider_images_owner_id, :dnsprovider_zones, :region, :availability_zone, :aws_ssh_key_id, :node_name, :client_key, :validation_client_name, :validation_key, :chef_server_url, :ssl_version, :identity_file, :branch, :environment, :ssh_user, :ssh_port, :role, :flavor, :security_groups, :deploy_cmd, :name, :image, :zone_name, :zone_url, :verbose, :query
 
 		def initialize(options={})
-			config_file = File.exists?('/etc/veronic/veronic.yml') ? '/etc/veronic/veronic.yml' : File.exists?('./veronic.yml') ? './veronic.yml' : nil
-			if config_file || File.exists?(options[:config_file])
-				config_from_file = YAML.load_file(options[:config_file] || config_file)
+			default_config_file = "/etc/veronic/veronic.yml"
+			config_from_file = Hash.new(nil)
+			if options[:config_file] && File.exists?(options[:config_file])
+				config_from_file = YAML.load_file(options[:config_file])
+			elsif File.exists?(default_config_file)
+				config_from_file = YAML.load_file(default_config_file)
 			end
 
 			@dnsprovider                      = options[:dnsprovider]                      || config_from_file['dnsprovider'] || :route53

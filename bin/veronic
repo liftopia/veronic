@@ -154,11 +154,11 @@ opt_parser.parse!
 
 case ARGV[0] || ENV['action']
 when "create"
-	Veronic::Deployer.new(options).create
+  Veronic::Deployer.new(options).create
 when "bootstrap"
   Veronic::Deployer.new(options).bootstrap
 when "destroy"
-	Veronic::Deployer.new(options).destroy
+  Veronic::Deployer.new(options).destroy
 when "deploy"
   Veronic::Deployer.new(options).deploy
 when "search_and_deploy"
@@ -170,18 +170,18 @@ when "deploy_apps"
 when "run_tests"
   Veronic::Deployer.new(options).run_tests
 when "update_instance_dns"
-	Veronic::Deployer.new(options).update_instance_dns
+  Veronic::Deployer.new(options).update_instance_dns
 when "stop"
-	Veronic::Deployer.new(options).stop
+  Veronic::Deployer.new(options).stop
 when "start"
-	Veronic::Deployer.new(options).start
+  Veronic::Deployer.new(options).start
 when "list"
   Veronic::Deployer.new(options).instances_list
 when "status"
-  @logger.info Veronic::Deployer.new(options).status
+  puts Veronic::Deployer.new(options).status
 when "create_image"
   image = Veronic::Deployer.new(options).create_image
-  @logger.info "ID: #{image.id}", "NAME: #{image.name}", "STATE: #{image.state}"
+  puts "ID: #{image.id}", "NAME: #{image.name}", "STATE: #{image.state}"
 else
-	@logger.info opt_parser
+  puts opt_parser
 end
