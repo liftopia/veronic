@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.files       = `git ls-files`.split("\n")
   s.require_paths = ["lib"]
   s.homepage    = 'http://github.com/GabKlein/veronic'
+  s.license     = 'MIT'
   s.add_dependency('chef')
   s.add_dependency('knife-ec2')
   s.add_dependency('aws-sdk')
