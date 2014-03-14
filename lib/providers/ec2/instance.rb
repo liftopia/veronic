@@ -12,7 +12,7 @@ module Provider
 
 			def stop
 				@logger.info "Stopping instance #{@name}..."
-				if self.exist?
+				if self.exists?
 					@instance.stop
 					i = 0
 					while self.status != :stopped
@@ -26,12 +26,12 @@ module Provider
 
 			def start
 				@logger.info "Starting instance #{@name}..."
-				if self.exist?
+				if self.exists?
 					while self.status == :stopping
 						sleep 2
 					end
 					@instance.start
-					i = 0 					
+					i = 0
 					while self.status != :running
 						@logger.info "." ; sleep 3 ; i += 1
 						return false if i > 120
@@ -100,7 +100,7 @@ module Provider
 					@instance.tags[k] = hash[k]
 				end
 			end
-					
+
 		end
 	end
 end
