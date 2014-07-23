@@ -1,0 +1,10 @@
+AllCops:
+  Exclude:
+    - db/**/*
+    - vendor/**/*
+
+HashSyntax:
+  EnforcedStyle: hash_rockets
+
+LineLength:
+  Max: 140

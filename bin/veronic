@@ -91,12 +91,12 @@ opt_parser = OptionParser.new do |opt|
   opt.on("-b","--branch BRANCH","Which branch you want to run a box for") do |b|
     options[:branch] = b
   end
-  
+
   options[:ssh_user] = ENV['ssh_user']
   opt.on("-u","--ssh_user ssh_user","Which ssh user use to connect box") do |s|
     options[:ssh_user] = s
   end
-  
+
   options[:ssh_port] = ENV['ssh_port']
   opt.on("-p","--ssh_port ssh_port","Which ssh port use to connect box") do |p|
     options[:ssh_port] = p
