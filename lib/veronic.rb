@@ -182,9 +182,6 @@ module Veronic
 				configprovider.instance.set_environment
 				configprovider.instance.set_role
 				cloudprovider.instance.tags({'role' => @config.role, 'environment' => @config.environment})
-				if configprovider.instance.delete_client_key(cloudprovider.instance.dns_name)
-					configprovider.instance.client.destroy
-				end
 			else
 				@logger.info 'Unable to set_node arguments --role or --environment is missing'
 			end
