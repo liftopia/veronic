@@ -63,6 +63,7 @@ module Provider
         node.config[:identity_file]     = @identity_file
         node.config[:environment]       = @environment
         node.config[:log_level]         = @verbose
+        node.config[:template_file]     = '/etc/veronic/bootstrap/lifted-chef.erb'
 
         @logger.info node.config
         begin
