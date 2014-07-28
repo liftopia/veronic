@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'veronic'
-  s.version     = '0.0.30'
-  s.date        = '2013-04-05'
+  s.version     = '0.0.31'
+  s.date        = '2014-07-28'
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.summary     = "Veronic, a simple cloud deployer"
   s.description = "A simple cloud deployer"
